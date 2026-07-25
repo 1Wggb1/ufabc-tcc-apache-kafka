@@ -45,147 +45,32 @@
 
   \section{Introdução}
 
-  Em sistemas distribuídos de alta volumetria de dados é essencial ter mecanismos que ajudem o sistemas a não sobrecarregarem em momentos de muito estresse. Filas, circuit breaker, rate limiting dentro outros são alguns dos mecanismos ou elementos que auxiliam os sistemas a lidarem de maneira que continuem em pleno funcionamento em picos de requisições, sendo eles exemplos de mecanismos de backpressure. No backpressure o desacoplamento entre os consumidores e produtores é um ponto muito importante, que é muitas vezes é trazido por filas ou brokens de mensageria sendo vital para consumidores processarem as mensagens de acordo com sua capacidade. Sem mecanismos de backpressure falhas em cascatas, instabilidades, e quedas podendo até acarretar em impossibilidades de uso. O Apache Kafka é uma ferramenta de processamento de streaming bastante utilizada em arquitetura orientada a eventos de alta volumetria , como em e-commerces, instituições financeiras \cite{apachekafka:2026}, o que garantindo estabilidade e escalabilidade \cite{meissne:2018}. O Apache Kafka traz mecanismos de backpressure nativos  que ferramentas comuns não fornecem da mesma forma, como seu modelo de pub/sub baseado em pull, consumers group e partições tornando o robusto para lidar com até milhões de eventos por segundo.
+  Em sistemas distribuídos de alta volumetria de dados é essencial ter mecanismos que ajudem o sistemas a não sobrecarregarem em momentos de muito estresse. Filas, circuit breaker, rate limiting dentro outros são alguns dos mecanismos ou elementos que auxiliam os sistemas a lidarem de maneira que continuem em pleno funcionamento em picos de requisições, sendo eles exemplos de mecanismos de backpressure. No backpressure o desacoplamento entre os consumidores e produtores é um ponto muito importante, que é muitas vezes é trazido por filas ou brokens de mensageria sendo vital para consumidores processarem as mensagens de acordo com sua capacidade. Sem mecanismos de backpressure falhas em cascatas, instabilidades, e quedas podendo até acarretar em impossibilidades de uso. O Apache Kafka é uma ferramenta de processamento de streaming bastante utilizada em arquitetura orientada a eventos de alta volumetria, como em e-commerces e instituições financeiras, estando presente em mais de 80\% das empresas da Fortune 100  \cite{apachekafka:2026}, o que garantindo estabilidade e escalabilidade \cite{meissne:2018}. O Apache Kafka traz mecanismos de backpressure nativos  que ferramentas comuns não fornecem da mesma forma, como seu modelo de pub/sub baseado em pull, consumers group e partições tornando o robusto para lidar com até milhões de eventos por segundo.
 
   Este artigo apresenta uma avaliação experimental do Apache Kafka, permitindo o entendimento de alguns mecanismos nativos da ferramenta que auxiliam no backpressure em sistemas distribuidos. Dentro os mecanismos avaliados estão: Throttling/Quotas, Buffer, modelo de pubsub utilizando pull e consumer group.
 
-
-  https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8533771
-
-
-
   \section{Revisão da Literatura} \label{sec:firstpage}
 
-  The first page must display the paper title, the name and address of the
-  authors, the abstract in English and ``resumo'' in Portuguese (``resumos'' are
-  required only for papers written in Portuguese). The title must be centered
-  over the whole page, in 16 point boldface font and with 12 points of space
-  before itself. Author names must be centered in 12 point font, bold, all of
-  them disposed in the same line, separated by commas and with 12 points of
-  space after the title. Addresses must be centered in 12 point font, also with
-  12 points of space after the authors' names. E-mail addresses should be
-  written using font Courier New, 10 point nominal size, with 6 points of space
-  before and 6 points of space after.
+  \subsection{Mecanismos de Backpressure}
+  Em sistemas distribuídos, backpressure é um mecanismo de controle de fluxo utilizado para gerir o envio de dados de um produtor para um consumidor de forma que o dado produzido não sobrecarregue o consumidor, ou seja, que o dado seja transferido a uma taxa compatível com o processamento do consumidor. A não utilização de mecanismos de backpressure pode causar desde aumento de latência, falhas de processamento e paralisação de sistemas, afetando diretamente os usuários finais dos sistemas. Além de afetar os custos de infraestrutura pela utilização excessiva de recursos nos consumidores (memória, cpu, network, filas etc). Os mecanismos são essenciais, pois sinalizam a produtores de dados, que os dados devem ser fornecidos a uma taxa menor ou devem ser paralizados por um período devido a sobrecarga dos consumidores. A subseções abaixo explicam melhor sobre alguns mecanismo de backpressure.
 
-  The abstract and ``resumo'' (if is the case) must be in 12 point Times font,
-  indented 0.8cm on both sides. The word \textbf{Abstract} and \textbf{Resumo},
-  should be written in boldface and must precede the text.
-
-  \subsection{Backpressure}
-
-  \subsection{Apache Kafka}
-
-  \subsection{Backpresseure com Apache Kafka}
+  \subsubsection{Controle de Fluxo}
+  Controle de velocidade
 
   \subsubsection{Buffer}
+  Utilizam de filas
 
-  \subsubsection{Quotas/Throttling}
+  \subsubsection{Padrões de Arquitetura}
+  Rate limiting, Circuit Break e Load Shedding
 
-  \subsubsection{PubSub pull-based}
-  https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8533771
-  https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9251089
-
-  \subsubsection{Consumer groups}
-
-  \section{Metodologia}
-
-  In some conferences, the papers are published on CD-ROM while only the
-  abstract is published in the printed Proceedings. In this case, authors are
-  invited to prepare two final versions of the paper. One, complete, to be
-  published on the CD and the other, containing only the first page, with
-  abstract and ``resumo'' (for papers in Portuguese).
-
-  \section{Conclusão}
-
-  Bibliographic references must be unambiguous and uniform.  We recommend giving
-  the author names references in brackets, e.g. \cite{knuth:84},
-  \cite{boulic:91}, and \cite{smith:99}.
-
-  The references must be listed using 12 point font size, with 6 points of space
-  before each reference. The first line of each reference should not be
-  indented, while the subsequent should be indented by 0.5 cm.
-
-  \bibliographystyle{sbc}
-  \bibliography{sbc-template}
-
-\end{document}\documentclass[12pt]{article}
-
-\usepackage{sbc-template}
-\usepackage{graphicx,url}
-\usepackage[utf8]{inputenc}
-\usepackage[brazil]{babel}
-\usepackage[latin1]{inputenc}
+  \subsubsection{Algoritmos e Protocolos}
+  TCP
 
 
-\sloppy
-
-\title{Mecanismos de Backpressure com Apache Kafka}
-
-\author{Willian Garbo G. Batista\inst{1}}
-
-
-\address{Instituto de Informática -- Universidade Federal do ABC
-  (UFABC)\\
-  Caixa Postal 15.064 -- 91.501-970 -- São Paulo -- SP -- Brazil
-  \email{wiilian.garbo@ufabc.edu.br}
-}
-
-\begin{document}
-
-  \maketitle
-
-  \begin{abstract}
-    This meta-paper describes the style to be used in articles and short papers
-    for SBC conferences. For papers in English, you should add just an abstract
-    while for the papers in Portuguese, we also ask for an abstract in
-    Portuguese (``resumo''). In both cases, abstracts should not have more than
-    10 lines and must be in the first page of the paper.
-  \end{abstract}
-
-  \begin{resumo}
-    Este meta-artigo descreve o estilo a ser usado na confecção de artigos e
-    resumos de artigos para publicação nos anais das conferências organizadas
-    pela SBC. É solicitada a escrita de resumo e abstract apenas para os artigos
-    escritos em português. Artigos em inglês deverão apresentar apenas abstract.
-    Nos dois casos, o autor deve tomar cuidado para que o resumo (e o abstract)
-    não ultrapassem 10 linhas cada, sendo que ambos devem estar na primeira
-    página do artigo.
-  \end{resumo}
-
-
-  \section{Introdução}
-
-  Em sistemas distribuídos de alta volumetria de dados é essencial ter mecanismos que ajudem o sistemas a não sobrecarregarem em momentos de muito estresse. Filas, circuit breaker, rate limiting dentro outros são alguns dos mecanismos ou elementos que auxiliam os sistemas a lidarem de maneira que continuem em pleno funcionamento em picos de requisições, sendo eles exemplos de mecanismos de backpressure. No backpressure o desacoplamento entre os consumidores e produtores é um ponto muito importante, que é muitas vezes é trazido por filas ou brokens de mensageria sendo vital para consumidores processarem as mensagens de acordo com sua capacidade. Sem mecanismos de backpressure falhas em cascatas, instabilidades, e quedas podendo até acarretar em impossibilidades de uso. O Apache Kafka é uma ferramenta de processamento de streaming bastante utilizada em arquitetura orientada a eventos de alta volumetria , como em e-commerces, instituições financeiras \cite{apachekafka:2026}, o que garantindo estabilidade e escalabilidade \cite{meissne:2018}. O Apache Kafka traz mecanismos de backpressure nativos  que ferramentas comuns não fornecem da mesma forma, como seu modelo de pub/sub baseado em pull, consumers group e partições tornando o robusto para lidar com até milhões de eventos por segundo.
-
-  Este artigo apresenta uma avaliação experimental do Apache Kafka, permitindo o entendimento de alguns mecanismos nativos da ferramenta que auxiliam no backpressure em sistemas distribuidos. Dentro os mecanismos avaliados estão: Throttling/Quotas, Buffer, modelo de pubsub utilizando pull e consumer group.
-
-
-  https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8533771
-
-
-
-  \section{Revisão da Literatura} \label{sec:firstpage}
-
-  The first page must display the paper title, the name and address of the
-  authors, the abstract in English and ``resumo'' in Portuguese (``resumos'' are
-  required only for papers written in Portuguese). The title must be centered
-  over the whole page, in 16 point boldface font and with 12 points of space
-  before itself. Author names must be centered in 12 point font, bold, all of
-  them disposed in the same line, separated by commas and with 12 points of
-  space after the title. Addresses must be centered in 12 point font, also with
-  12 points of space after the authors' names. E-mail addresses should be
-  written using font Courier New, 10 point nominal size, with 6 points of space
-  before and 6 points of space after.
-
-  The abstract and ``resumo'' (if is the case) must be in 12 point Times font,
-  indented 0.8cm on both sides. The word \textbf{Abstract} and \textbf{Resumo},
-  should be written in boldface and must precede the text.
-
-  \subsection{Backpressure}
 
   \subsection{Apache Kafka}
 
-  \subsection{Backpresseure com Apache Kafka}
+  \subsection{Mecanismos de Backpresseure com Apache Kafka}
 
   \subsubsection{Buffer}
 

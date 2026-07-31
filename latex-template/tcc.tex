@@ -52,7 +52,7 @@
   \section{Revisão da Literatura} \label{sec:firstpage}
 
   \subsection{Mecanismos de Backpressure}
-  Em sistemas distribuídos, backpressure é um mecanismo de controle de fluxo utilizado para gerir o envio de dados de um produtor (upstream) para um consumidor (downstream) de forma que o dado produzido não sobrecarregue o consumidor, ou seja, que o dado seja transferido a uma taxa compatível com o processamento do consumidor \cite{fischer2022grokking}. A não utilização de mecanismos de backpressure pode causar desde aumento de latência, falhas de processamento e paralisação de sistemas, afetando diretamente os usuários finais dos sistemas. Além de afetar os custos de infraestrutura pela utilização excessiva de recursos nos consumidores (memória, cpu, network, filas etc). Os mecanismos são essenciais, pois sinalizam a produtores de dados, que os dados devem ser fornecidos a uma taxa menor ou devem ser paralizados por um período devido a sobrecarga dos consumidores. A subseções abaixo explicam melhor sobre alguns mecanismos de backpressure.
+  Em sistemas distribuídos, backpressure é um mecanismo de controle de fluxo utilizado para gerir o envio de dados de um produtor (upstream) para um consumidor (downstream) de forma que o dado produzido não sobrecarregue o consumidor, ou seja, que o dado seja transferido a uma taxa compatível com o processamento do consumidor \cite{fischer2022grokking}. A não utilização de mecanismos de backpressure pode causar desde aumento de latência, falhas de processamento e paralisação de sistemas, afetando diretamente os usuários finais dos sistemas. Além de afetar os custos de infraestrutura pela utilização excessiva de recursos nos consumidores (memória, cpu, network, filas etc). Os mecanismos são essenciais, pois sinalizam a produtores de dados, que os dados devem ser fornecidos a uma taxa menor ou devem ser paralizados por um período devido a sobrecarga dos consumidores. De acordo com Newman o backpressure pode ser implementado, do lado do cliente, como circuit break, e em ambos os lados, onde tanto o cliente quando o servidor entram em acordo, como rate limiting \cite{newmanresilientds}. A subseções abaixo explicam melhor sobre alguns mecanismos de backpressure.
 
   \subsubsection{Controle de Fluxo}
   É um mecanismo que faz a compatibilização de velocidade de produtor e consumidor \cite{kurose2013redes}, o que pode fazer com que os dados produzidos sejam recusados por um período até o consumidor consiga processar os dados. O controle de fluxo está presente no protocolo TCP, onde os dados são armazenados no buffer do consumidor, e de acordo com a  saturação do buffer o controle de fluxo passa a recursar mensagem do produtor. O produtor recebe uma sinalização do tamanho disponível do buffer do consumidor para evitar transmitir dados a uma velocidade que não poderá ser processada. Neste mecanismo de backpressure o produtor a partir de um dado enviado pelo consumidor consegue fazer a adaptação de sua taxa de transmissão para não sobrecarregar o consumidor e seu buffer.
@@ -62,10 +62,13 @@
 
   \subsubsection{Padrões de Arquitetura}
   \subsubsection{Rate limiting}
-  É um padrão de arquitetura que restringe a quantidade de reuisições por período de tempo
+  É um padrão de arquitetura que restringe a quantidade de requisições por período de tempo
 
   \subsubsection{Circuit Break}
+  É um padrão de arquitetura onde a aplicação cliente passa a bloquear novas requisições ao servidor, quando um determinado limite de respostas com erros acontece \cite{newmanresilientds}.
+
   \subsubsection{Load Shedding}
+  É um padrão de arquitetura onde o sistema passa a rejeitar as requisições quando um determinado limite é atingido para se manter saudável \cite{newmanresilientds}, assim sendo possível continuar operando normalmente para algumas requisições. Quando o limite é atingido, novas solicitações não são processadas e e é dada uma mensagem ao cliente informando que não será possível tratar a requisição naquele momente (considerando uma API HTTP, poderia ser retornado o status code 429 Too Many Request ou 503 Service Unavailable).
 
   \subsection{Apache Kafka}
 

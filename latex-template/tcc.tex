@@ -52,7 +52,7 @@
   \section{Revisão da Literatura} \label{sec:firstpage}
 
   \subsection{Mecanismos de Backpressure}
-  Em sistemas distribuídos, backpressure é um mecanismo de controle de fluxo utilizado para gerir o envio de dados de um produtor (upstream) para um consumidor (downstream) de forma que o dado produzido não sobrecarregue o consumidor, ou seja, que o dado seja transferido a uma taxa compatível com o processamento do consumidor \cite{fischer2022grokking}. A não utilização de mecanismos de backpressure pode causar desde aumento de latência, falhas de processamento e paralisação de sistemas, afetando diretamente os usuários finais dos sistemas. Além de afetar os custos de infraestrutura pela utilização excessiva de recursos nos consumidores (memória, cpu, network, filas etc). Os mecanismos são essenciais, pois sinalizam a produtores de dados, que os dados devem ser fornecidos a uma taxa menor ou devem ser paralizados por um período devido a sobrecarga dos consumidores. De acordo com Newman o backpressure pode ser implementado, do lado do cliente, como circuit break, e em ambos os lados, onde tanto o cliente quando o servidor entram em acordo, como rate limiting \cite{newmanresilientds}. A subseções abaixo explicam melhor sobre alguns mecanismos de backpressure.
+  Em sistemas distribuídos, backpressure é um mecanismo de controle de fluxo utilizado para gerir o envio de dados de um produtor (upstream) para um consumidor (downstream) de forma que o dado produzido não sobrecarregue o consumidor, ou seja, que o dado seja transferido a uma taxa compatível com o processamento do consumidor \cite{fischer2022grokking, geeksforGeeks2026Jan}. A não utilização de mecanismos de backpressure pode causar desde aumento de latência, falhas de processamento e paralisação de sistemas, afetando diretamente os usuários finais dos sistemas. Além de afetar os custos de infraestrutura pela utilização excessiva de recursos nos consumidores (memória, cpu, network, filas etc), podendo ocorrer loops na inicialização da aplicação devido a sobrecarga que se se não monitorados causam danos financeiros altissimos \cite{newmanresilientds}. Os mecanismos são essenciais, pois sinalizam a produtores de dados, que os dados devem ser fornecidos a uma taxa menor ou devem ser paralizados por um período devido a sobrecarga dos consumidores. De acordo com Newman o backpressure pode ser implementado, do lado do cliente, como circuit break, e em ambos os lados, onde tanto o cliente quando o servidor entram em acordo, como rate limiting \cite{newmanresilientds}. A subseções abaixo explicam melhor sobre alguns mecanismos de backpressure.
 
   \subsubsection{Controle de Fluxo}
   É um mecanismo que faz a compatibilização de velocidade de produtor e consumidor \cite{kurose2013redes}, o que pode fazer com que os dados produzidos sejam recusados por um período até o consumidor consiga processar os dados. O controle de fluxo está presente no protocolo TCP, onde os dados são armazenados no buffer do consumidor, e de acordo com a  saturação do buffer o controle de fluxo passa a recursar mensagem do produtor. O produtor recebe uma sinalização do tamanho disponível do buffer do consumidor para evitar transmitir dados a uma velocidade que não poderá ser processada. Neste mecanismo de backpressure o produtor a partir de um dado enviado pelo consumidor consegue fazer a adaptação de sua taxa de transmissão para não sobrecarregar o consumidor e seu buffer.
@@ -62,15 +62,16 @@
 
   \subsubsection{Padrões de Arquitetura}
   \subsubsection{Rate limiting}
-  É um padrão de arquitetura que restringe a quantidade de requisições por período de tempo
+  É um padrão de arquitetura que restringe a quantidade de requisições por período de tempo (podendo ser em segundos, minutos ou horas) para cada cliente, deste modo, evitando consumo abusivo, o que poderia sobrecarregar o servidor e afetar o uso de recursos do servidor para outros clientes. Quando o limite de requisições é atingido o padrão passa a rejeitar novas requisições do cliente por uma mensagem (geralmente em HTTP status code 429 junto com uma mensagem no corpo). O padrão ajuda a evitar DoS (Denial of Service), assim mantendo a estabilidade do servidor. Neste padrão o backpressure está no fato de não permitir que um cliente consuma excessivamente o consumo de recursos de um servidor \cite{apiace:2023:europlop, agarwal2025Nov}.
 
   \subsubsection{Circuit Break}
-  É um padrão de arquitetura onde a aplicação cliente passa a bloquear novas requisições ao servidor, quando um determinado limite de respostas com erros acontece \cite{newmanresilientds}.
+  É um padrão de arquitetura onde a aplicação cliente passa a bloquear novas requisições ao servidor, quando um determinado limite de respostas com erros são retornadas pelo servidor acontece \cite{newmanresilientds}. Quando o limite é atingido, o circuito é aberto evitando novas solicitações por um determinado período, após esse período o circuito passa para o estado meio-aberto, onde passa a aceitar algumas requisições para validar se o problema continua, caso seja possivel fazer as requisições normalmente ao servidor o circuito é fechado, e o sistema volta ao estado normal. Caso contrário o mesmo volta para o estado de aberto. Esse padrão tem uma característica de falhar rápido o que permite o retorno de um feedback instântaneo sobre a requisição. Neste padrão o backpressue é implementado no lado cliente, onde o mesmo ativamente passa a evitar de enviar requisições quando existem erros retornados pelo servidor.
 
   \subsubsection{Load Shedding}
-  É um padrão de arquitetura onde o sistema passa a rejeitar as requisições quando um determinado limite é atingido para se manter saudável \cite{newmanresilientds}, assim sendo possível continuar operando normalmente para algumas requisições. Quando o limite é atingido, novas solicitações não são processadas e e é dada uma mensagem ao cliente informando que não será possível tratar a requisição naquele momente (considerando uma API HTTP, poderia ser retornado o status code 429 Too Many Request ou 503 Service Unavailable).
+  É um padrão de arquitetura onde o sistema passa a rejeitar as requisições quando um determinado limite é atingido para se manter saudável \cite{newmanresilientds}, assim sendo possível continuar operando normalmente para algumas requisições. Quando o limite é atingido, novas solicitações não são processadas, e é dada uma mensagem ao cliente informando que não será possível tratar a requisição naquele momente (considerando uma API HTTP, poderia ser retornado o status code 429 Too Many Request ou 503 Service Unavailable). Esse é um outro mecanismo que atua como backpressure, pois quando um determinado limite é atingido o sistema passa a rejeitar algumas novas solicitações evitando sua sobrecarga.
 
   \subsection{Apache Kafka}
+  Apache Kafka é uma ferramenta open-source distribuida de streaming de eventos focada em lidar com alta volumetria de dados com baixa latência e resiliência \cite{apacheKafka2026May, gorshkova2026kafka}. A plataforma atua como um broker de mensageria com alta disponibilidade e resiliente, sendo amplamente utilizada em sistemas críticos ou de alta volumetria que atuam com arquitetura orientada a eventos. Entre suas principais características estão seu funcionamento no modelo pubsub (publisher-subscriber), seu armazenamento imutável de eventos (append-only log) e sua capacidade de escalabilidade por sua funcionar em cluster, e por possuir partições de dados e consumer group.  Entre os conceitos essenciais da plataforma estão broker, produtor, tópicos, partições e consumidor \cite{confluenceKafka2026Jul}.
 
   \subsection{Mecanismos de Backpresseure com Apache Kafka}
 
@@ -79,28 +80,14 @@
   \subsubsection{Quotas/Throttling}
 
   \subsubsection{PubSub pull-based}
-  https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8533771
-  https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9251089
 
   \subsubsection{Consumer groups}
 
   \section{Metodologia}
 
-  In some conferences, the papers are published on CD-ROM while only the
-  abstract is published in the printed Proceedings. In this case, authors are
-  invited to prepare two final versions of the paper. One, complete, to be
-  published on the CD and the other, containing only the first page, with
-  abstract and ``resumo'' (for papers in Portuguese).
+  \section{Experimentos}
 
   \section{Conclusão}
-
-  Bibliographic references must be unambiguous and uniform.  We recommend giving
-  the author names references in brackets, e.g. \cite{knuth:84},
-  \cite{boulic:91}, and \cite{smith:99}.
-
-  The references must be listed using 12 point font size, with 6 points of space
-  before each reference. The first line of each reference should not be
-  indented, while the subsequent should be indented by 0.5 cm.
 
   \bibliographystyle{sbc}
   \bibliography{sbc-template}

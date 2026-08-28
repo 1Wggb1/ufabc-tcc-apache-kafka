@@ -35,9 +35,9 @@
 
   \section{Introdução}
 
-  Em sistemas distribuídos de alta volumetria de dados é essencial ter mecanismos que ajudem os sistemas a evitar sobrecarga durante períodos de alta demanda. Diversos mecanismos podem ser empregados para controlar a sobrecarga do sistema, incluindo filas de mensagens, circuit breakers e técnicas de rate limiting. Eles auxiliam os sistemas a lidarem de maneira que continuem em pleno funcionamento em picos de requisições, sendo eles exemplos de mecanismos de backpressure. No backpressure o desacoplamento entre os consumidores e produtores é um ponto muito importante, que é muitas vezes é trazido por filas ou brokers de mensageria sendo vital para consumidores processarem as mensagens de acordo com sua capacidade. Sem mecanismos de backpressure falhas em cascatas, instabilidades e quedas podem acontecer em momentos de alta carga afetando a confiabilidade do sistema. O Apache Kafka é uma plataforma de processamento de streaming bastante utilizada em arquitetura orientada a eventos de alta volumetria, como em e-commerces e instituições financeiras, estando presente em mais de 80\% das empresas da Fortune 100, de acordo com a documentação da plataforma \cite{apachekafka:2026}. A plataforma garante a estabilidade e escalabilidade de aplicações criticas \cite{meissne:2018} a partir mecanismos de backpressure nativos, que ferramentas comuns não fornecem da mesma forma, por não serem robustas igual o Apache Kafka. O modelo de pub-sub baseado em pull, consumers group e partições tornam o Kafka robusto para lidar com até milhões de eventos por segundo.
+  Em sistemas distribuídos de alta volumetria de dados é essencial ter mecanismos que ajudem os sistemas a evitar sobrecarga durante períodos de alta demanda. Diversos mecanismos podem ser empregados para controlar a sobrecarga do sistema, incluindo filas de mensagens, circuit breakers e técnicas de rate limiting. Eles auxiliam os sistemas a lidarem de maneira que continuem em pleno funcionamento em picos de requisições, sendo eles exemplos de mecanismos de backpressure. No backpressure o desacoplamento entre os consumidores e produtores é um ponto muito importante, que é muitas vezes é trazido por filas ou brokers de mensageria sendo vital para consumidores processarem as mensagens de acordo com sua capacidade. Sem mecanismos de backpressure falhas em cascatas, instabilidades e quedas podem acontecer em momentos de alta carga afetando a confiabilidade do sistema. O Apache Kafka é uma plataforma de processamento de streaming bastante utilizada em arquitetura orientada a eventos de alta volumetria, como em e-commerces e instituições financeiras, estando presente em mais de 80\% das empresas da Fortune 100, de acordo com a documentação da plataforma \cite{apachekafka:2026}. A plataforma garante a estabilidade e escalabilidade de aplicações criticas \cite{meissne:2018} a partir mecanismos de backpressure nativos, que outras plataformas não fornecem da mesma forma, por não serem robustas igual o Apache Kafka. O modelo de pub-sub baseado em pull, consumers group e partições tornam o Kafka robusto para lidar com até milhões de eventos por segundo.
 
-  Este artigo apresenta uma avaliação experimental do Apache Kafka, permitindo o entendimento de alguns mecanismos nativos que auxiliam no backpressure em sistemas distribuidos. Dentre os mecanismos avaliados estão: Quotas, Buffer, modelo de pub-sub utilizando pull e consumer groups.
+  Este artigo apresenta uma avaliação experimental do Apache Kafka, permitindo o entendimento de alguns mecanismos nativos que auxiliam no backpressure em sistemas distribuidos. O objetivo do artigo é tornar explicito os mecanismos de backpressure presentes na plataforma, pois na literatura há uma carência de artigos que abordam esse tópico.
 
   \section{Revisão da Literatura} \label{sec:firstpage}
 
@@ -52,16 +52,16 @@
 
   \subsubsection{Padrões de Arquitetura}
   \subsubsection{Rate limiting}
-  É um padrão de arquitetura que restringe a quantidade de requisições por período de tempo (podendo ser em segundos, minutos ou horas) para cada cliente, deste modo, evitando consumo abusivo, o que poderia sobrecarregar o servidor e afetar o uso de recursos do servidor para outros clientes. Quando o limite de requisições é atingido o padrão passa a rejeitar novas requisições do cliente por uma mensagem (geralmente em HTTP status code 429 junto com uma mensagem no corpo). O padrão ajuda a evitar DoS (Denial of Service), assim mantendo a estabilidade do servidor. Neste padrão o backpressure está no fato de não permitir que um cliente consuma excessivamente o consumo de recursos de um servidor \cite{apiace:2023:europlop, agarwal2025Nov, wangRatelimiting2024}.
+  É um padrão de arquitetura que restringe a quantidade de requisições por período de tempo (podendo ser em segundos, minutos ou horas) para cada cliente, deste modo, evitando consumo abusivo, o que poderia sobrecarregar o servidor e afetar o uso de recursos para outros clientes. Quando o limite de requisições é atingido o padrão passa a rejeitar novas requisições do cliente e informá-lo por uma mensagem, geralmente em HTTP status code 429 junto com uma mensagem. O padrão ajuda a evitar DoS (Denial of Service), por não permitir que um único cliente utilize mais recurso que o permitido, assim mantendo a estabilidade do servidor. Neste padrão o backpressure está no fato de não permitir que um cliente consuma excessivamente o consumo de recursos de um servidor \cite{apiace:2023:europlop, agarwal2025, wangRatelimiting2024}.
 
   \subsubsection{Circuit Break}
   É um padrão de arquitetura em que a aplicação cliente passa a bloquear novas requisições ao servidor, quando um determinado limite de respostas com erros são retornadas pelo servidor \cite{newmanresilientds, brucemicroservices2024}, previnindo falhas em cascata. Quando o limite é atingido, o circuito é aberto (open) evitando novas solicitações por um determinado período, após esse período o circuito passa para o estado meio-aberto (half-open), em que passa a aceitar algumas requisições para validar a saúde do servidor. Caso seja possivel fazer as requisições normalmente ao servidor o circuito é fechado (closed), e o sistema volta ao estado normal. Caso contrário o mesmo volta para o estado de aberto (open) por mais um período. Esse padrão tem uma característica de falhar rápido o que permite o retorno de um feedback instântaneo à requisição. Neste padrão o backpressure é implementado no lado cliente, cujo funcionamento o mesmo ativamente passa a evitar de enviar requisições quando existem erros retornados pelo servidor.
 
   \subsubsection{Load Shedding}
-  É um padrão de arquitetura no qual o sistema passa a rejeitar as requisições quando um determinado limite é atingido para se manter saudável \cite{newmanresilientds}, assim sendo possível continuar operando normalmente para algumas requisições. Quando o limite é atingido, novas solicitações recebem uma mensagem informando ao cliente que não será possível tratar a requisição naquele momento (considerando uma API HTTP, poderia ser retornado o status code 429 Too Many Request ou 503 Service Unavailable). Esse é um outro mecanismo que atua como backpressure, pois quando um determinado limite é atingido o sistema passa a rejeitar  solicitações excedentes evitando sua sobrecarga.
+  É um padrão de arquitetura no qual o servidor passa a rejeitar algumas  requisições quando um determinado limite é atingido, para se manter saudável \cite{newmanresilientds}, assim é possível continuar operando normalmente para uma parcela das requisições. Quando o limite é atingido, novas solicitações recebem uma mensagem informando ao cliente que não será possível tratar a requisição naquele momento (considerando uma API HTTP, poderia ser retornado o status code 429 Too Many Request ou 503 Service Unavailable). Esse é um outro mecanismo que atua como backpressure, pois quando um determinado limite é atingido o servidor passa a rejeitar  solicitações excedentes evitando sua sobrecarga.
 
   \subsection{Apache Kafka}
-  Apache Kafka é uma ferramenta open-source distribuida de streaming de eventos focada em lidar com alta volumetria de dados, baixa latência e resiliência \cite{apacheKafka2026May, gorshkova2026kafka}. A plataforma atua como um broker de mensageria com alta disponibilidade e resiliente, sendo amplamente utilizada em sistemas críticos ou de alta volumetria que atuam com arquitetura orientada a eventos. Entre suas principais características estão seu funcionamento no modelo pub-sub (publisher-subscriber), seu armazenamento imutável de eventos (append-only log) e sua capacidade de escalabilidade por sua funcionar em cluster, e por possuir partições de dados e consumer group.  Entre os conceitos essenciais da plataforma estão brokers, produtores, tópicos, partições e consumidores \cite{confluenceKafka2026Jul}.
+  Apache Kafka é uma plataforma open-source distribuida de streaming de eventos focada em lidar com alta volumetria de dados, baixa latência e resiliência \cite{apacheKafka2026, gorshkova2026kafka}. A plataforma atua como um broker de mensageria com alta disponibilidade e resiliente, sendo amplamente utilizada em sistemas críticos ou de alta volumetria que atuam com arquitetura orientada a eventos. Entre suas principais características estão seu funcionamento no modelo pub-sub (publisher-subscriber), seu armazenamento imutável de eventos (append-only log) e sua capacidade de escalabilidade por sua funcionar em cluster, e por possuir partições de dados e consumer group.  Entre os conceitos essenciais da plataforma estão brokers, produtores, tópicos, partições e consumidores \cite{confluentKafka2026}.
 
   \begin{itemize}
     \item \textbf{Clusters}: São um conjunto de brokers que juntos trabalham para tornar o Apache Kafka altamente disponível e resiliente;
@@ -83,10 +83,10 @@
   \subsection{Mecanismos de Backpresseure com Apache Kafka}
 
   \subsubsection{Buffer}
-  São os tópicos e partições em que os eventos são armazenados. A implementação do backpressure acontece no fato dos eventos serem guardados para futuro processamento sem sobrecarga dos consumidores.
+  São os tópicos com partições, em que, os eventos são armazenados. A implementação do backpressure acontece no fato dos eventos serem guardados para futuro processamento sem sobrecarga dos consumidores.
 
   \subsubsection{Quotas}
-  Quotas no Kafka que permite especificar um limite máximo em Bytes para produtores ou clientes por segundos, evitando sobrecarga dos brokers por consumidores ou produtores únicos.
+  Quotas no Kafka que permite especificar um limite máximo em Bytes para produtores ou clientes por segundos, em todos os tópicos, evitando sobrecarga dos brokers. No caso dos produtores, o Apache Kafka não rejeita os eventos, mas passa a atrasar as resposta de confirmação, assim evitando o envio de novos eventos. Quando o limite é atingido o cliente recebe uma resposta com o tempo até que o próximo evento possa ser enviado, com esse valor o cliente pode ajustar seus envios. \cite{conduktorQuotaDerosiaux2026}
 
   \subsubsection{Pub-Sub pull-based}
   Modelo que permite a independência de produtores e consumidores de eventos. Na qual os consumidores recuperam os eventos ativamente de tempos em tempos. O modelo favorece o backpressure, pois os consumidores recuperam os eventos quando estiverem disponíveis para o processamento.
@@ -95,6 +95,17 @@
   Agrupamento de consumidores que permite a escalabilidade horizontal para o processamento de eventos de diferentes partições em paralelo, agindo  passivamente como backpressure.
 
   \section{Metodologia}
+
+  \subsection{Tipo de estudo}
+  Este trabalho caracteriza-se como, uma pesquisa experimental quantitativa com abordagem comparativa. Trata-se de um experimento controlado, no qual, duas implementações equivalentes de uma aplicação é submetida a cenários de carga parecidos, no qual, são coletadas algumas métricas de desempenho, permitindo entender o backpressure aplicado pela plataforma Apache Kafka, em uma aplicação que a utiliza e a outra não.
+
+  \subsection{Métricas do experimento}
+  No experimento serão feitas comparações com base nas métricas: latência e consumo de recursos computacionais, como CPU e Memória RAM.
+
+  \subsection{Ambiente de execução}
+
+
+  \subsection{Planejamento dos testes de carga}
 
   \section{Experimentos}
 

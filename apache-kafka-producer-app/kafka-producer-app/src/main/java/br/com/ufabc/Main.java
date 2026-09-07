@@ -3,6 +3,7 @@ package br.com.ufabc;
 
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +23,20 @@ class Main {
     @RestController
     @RequestMapping("/produces")
     public static class Controller {
+        private final String bootstrapServers;
+        private final String topic;
+
+        public Controller(@Value(value = "${kafka.bootstrap.servers}") String bootstrapServers,
+                          @Value(value = "${kafka.topic.name}") String topic) {
+            this.bootstrapServers = bootstrapServers;
+            this.topic = topic;
+        }
+
         @GetMapping
         public ResponseEntity<String> print(){
-            String bootstrapServers = "127.0.0.1:9092";
 
-            // create Producer properties
             Properties properties = new Properties();
+            System.out.println(bootstrapServers);
             properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
             properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
             properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
@@ -35,7 +44,7 @@ class Main {
 
             for(int i = 0; i < 100; i++){
                 ProducerRecord<String, String> producerRecord =
-                        new ProducerRecord<>("first_topic", "" + i,"""
+                        new ProducerRecord<>(topic, "" + i,"""
                             {
                                 "sku": "1020rit"
                             }

@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("org.springframework.boot") version "4.1.1"
 }
 
 group = "br.com.ufabc"
@@ -15,6 +16,10 @@ dependencies {
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+}
+
+tasks.jar {
+    enabled = false
 }
 
 tasks.test {

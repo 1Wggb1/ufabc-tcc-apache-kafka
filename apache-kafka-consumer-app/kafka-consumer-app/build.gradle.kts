@@ -19,3 +19,16 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
+
+tasks.jar {
+    manifest {
+        attributes(
+            "Main-Class" to "br.com.ufabc.Main",
+            "Class-Path" to configurations.runtimeClasspath.get()
+                .map { it.name }
+                .joinToString(" ")
+        )
+    }
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+}
+

@@ -16,23 +16,23 @@ class Main {
     }
 
     private static void consumeMessages() {
-        String bootstrapServers = "127.0.0.1:9092";
-        String groupId = "my-fourth-application";
-        String topic = "first_topic";
-
         Properties properties = new Properties();
+        String bootstrapServers = System.getenv("BOOTSTRAP_SERVERS");
+        System.out.println(bootstrapServers);
         properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        String groupId = System.getenv("GROUP_ID");
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-        properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        String offsetResetConfig = System.getenv("OFFSET_RESET_CONFIG");
+        properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, offsetResetConfig);
 
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
+        String topic = System.getenv("TOPIC_NAME");
         consumer.subscribe(List.of(topic));
 
         while(true){
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-
             for (ConsumerRecord<String, String> record : records){
                 IO.println("Key: " + record.key() + ", Value: " + record.value());
                 IO.println("Partition: " + record.partition() + ", Offset:" + record.offset());

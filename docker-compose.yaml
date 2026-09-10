@@ -20,6 +20,8 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_NUM_PARTITIONS: 3
       CLUSTER_ID: 5L6g3nShT-eMCtK--X86sw
+    networks:
+      - kafka-network
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -29,6 +31,8 @@ services:
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker:29092
+    networks:
+      - kafka-network
     depends_on:
       - broker
 
@@ -41,6 +45,14 @@ services:
     environment:
       BOOTSTRAP_SERVERS: broker:29092
       TOPIC_NAME: ufabc.tcc.topic
+      GENERATE_MESSAGES_NUM: 100
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 128m
+    networks:
+      - kafka-network
     depends_on:
       - broker
 
@@ -53,8 +65,19 @@ services:
       TOPIC_NAME: ufabc.tcc.topic
       GROUP_ID: ufabc.consumer
       OFFSET_RESET_CONFIG: earliest
+      POLL_FREQUENCY_MILLIS: 2000
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 128m
+    networks:
+      - kafka-network
     depends_on:
       - broker
 
+networks:
+  kafka-network:
+    driver: bridge
 # Apply quota to producer by clientId
 # docker exec -it 75e /opt/kafka/bin/kafka-configs.sh --bootstrap-server localhost:9092 --alter --add-config 'producer_byte_rate=1048' --entity-type clients --entity-name my-producer-app

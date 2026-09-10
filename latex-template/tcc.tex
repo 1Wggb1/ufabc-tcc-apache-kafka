@@ -108,6 +108,14 @@
   \subsection{Planejamento dos experimentos}
   Foram feitos testes de carga em alguns níveis de concorrência para avaliar o comportamento do backpressure aplicado pelo Apache Kafka. Sendo possível avaliar as taxas de requisições com sucesso e com falha, além da saturação das aplicações no ambiente conteinerizado. Nos testes serão explorados os mecanismos que auxiliam no backpressure: buffer, modelo pub-sub, quotas e consumer groups.
 
+  \begin{enumerate}
+    \item Buffer: Será avaliado o consumo de CPU e memória de duas aplicações uma aplicação com a utilização do buffer pelo Apache Kafka e outra não
+    \item PubSub: Será avaliado o desacomplamento obtido pelo modelo PubSub
+    \item Quotas
+    \item Consumer Groups
+  \end{enumerate}
+
+
   \section{Experimentos}
 
   \section{Conclusão}

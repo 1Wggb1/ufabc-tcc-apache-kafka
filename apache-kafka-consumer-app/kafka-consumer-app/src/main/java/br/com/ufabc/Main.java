@@ -31,8 +31,10 @@ class Main {
         String topic = System.getenv("TOPIC_NAME");
         consumer.subscribe(List.of(topic));
 
+
+        int pollFrequencyMillis = Integer.parseInt(System.getenv("POLL_FREQUENCY_MILLIS"));
         while(true){
-            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(pollFrequencyMillis));
             for (ConsumerRecord<String, String> record : records){
                 IO.println("Key: " + record.key() + ", Value: " + record.value());
                 IO.println("Partition: " + record.partition() + ", Offset:" + record.offset());

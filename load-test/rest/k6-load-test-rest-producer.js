@@ -2,12 +2,14 @@ import http from 'k6/http';
 import { sleep, check } from 'k6';
 
 const requests = [
-    ['POST', 'http://producer-app:8090/produces', null],
+    ['POST', 'http://rest-producer-app:8060/produces', null],
 ];
 
 export const options = {
   stages: [
-    { duration: '1s', target: 10 },
+    { duration: '10s', target: 100 },
+    { duration: '5s', target: 100 },
+    { duration: '5s', target: 0 },
   ],
   thresholds: Object.fromEntries(
     ['http_req_duration', 'http_reqs', 'http_req_failed']

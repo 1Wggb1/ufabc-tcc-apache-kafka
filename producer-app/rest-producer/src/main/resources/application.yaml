@@ -1,0 +1,2 @@
+server.port: 8060
+consumer.endpoint.url: ${CONSUMER_ENDPOINT_URL:http://localhost:8070/consumes}

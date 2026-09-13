@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SpringBootApplication
 class Main {
@@ -22,53 +23,49 @@ class Main {
 
     @RestController
     @RequestMapping("/produces")
-    public static class Controller {
+    public static class ProducesController {
         private final String bootstrapServers;
         private final String topic;
-        private final int generateMessagesNum;
+        private final AtomicInteger requestNumber;
 
-        public Controller(@Value(value = "${kafka.bootstrap.servers}") String bootstrapServers,
-                          @Value(value = "${kafka.topic.name}") String topic,
-                          @Value(value = "${generate.messages.num}") int generateMessagesNum) {
+        public ProducesController(@Value(value = "${kafka.bootstrap.servers}") String bootstrapServers,
+                                  @Value(value = "${kafka.topic.name}") String topic) {
             this.bootstrapServers = bootstrapServers;
             this.topic = topic;
-            this.generateMessagesNum = generateMessagesNum;
+            this.requestNumber = new AtomicInteger();
         }
 
         @PostMapping
         public ResponseEntity<String> print(){
-
             Properties properties = new Properties();
             properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
             properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
             properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
             KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
-            System.out.println("Generating %s messages".formatted(generateMessagesNum));
-            for(int i = 0; i < generateMessagesNum; i++){
-                ProducerRecord<String, String> producerRecord =
-                        new ProducerRecord<>(topic, "" + i,"""
-                            {
-                                "sku": "%s"
-                            }
-                            """.formatted(i));
-                producer.send(producerRecord, (recordMetadata, e) -> {
-                    // executes every time a record is successfully sent or an exception is thrown
-                    if (e == null) {
-                        // the record was successfully sent
-                        IO.println("Received new metadata. \n" +
-                                "Topic:" + recordMetadata.topic() + "\n" +
-                                "Partition: " + recordMetadata.partition() + "\n" +
-                                "Offset: " + recordMetadata.offset() + "\n" +
-                                "Timestamp: " + recordMetadata.timestamp());
-                    } else {
-                        IO.println("Error while producing %s".formatted(e.getMessage()));
+            String payload = """
+                    {
+                        "sku": "%s"
                     }
-                });
-            }
+                    """.formatted(requestNumber.addAndGet(1));
+            ProducerRecord<String, String> producerRecord = new ProducerRecord<>(topic, "" + requestNumber.get(), payload);
+            doSend(producer, producerRecord);
             producer.flush();
             producer.close();
-
             return ResponseEntity.ok("produces");
+        }
+
+        private static void doSend(KafkaProducer<String, String> producer, ProducerRecord<String, String> producerRecord) {
+            producer.send(producerRecord, (recordMetadata, e) -> {
+                if (e == null) {
+                    IO.println("Received new metadata. \n" +
+                            "Topic:" + recordMetadata.topic() + "\n" +
+                            "Partition: " + recordMetadata.partition() + "\n" +
+                            "Offset: " + recordMetadata.offset() + "\n" +
+                            "Timestamp: " + recordMetadata.timestamp());
+                    return;
+                }
+                IO.println("Error while producing %s".formatted(e.getMessage()));
+            });
         }
     }
 }

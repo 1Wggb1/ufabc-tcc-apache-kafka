@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.Properties;
 
 class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         consumeMessages();
     }
 
-    private static void consumeMessages() {
+    private static void consumeMessages() throws InterruptedException {
         Properties properties = new Properties();
         String bootstrapServers = System.getenv("BOOTSTRAP_SERVERS");
         System.out.println(bootstrapServers);
@@ -36,8 +36,11 @@ class Main {
         while(true){
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(pollFrequencyMillis));
             for (ConsumerRecord<String, String> record : records){
-                IO.println("Key: " + record.key() + ", Value: " + record.value());
-                IO.println("Partition: " + record.partition() + ", Offset:" + record.offset());
+                IO.println("Key: " + record.key() + ", Partition: " + record.partition() + ", Offset:" + record.offset());
+                String value = record.value();
+                IO.println("Starting event consume %s".formatted(value));
+                Thread.sleep(3_000);
+                IO.println("Event processed %s".formatted(value));
             }
         }
     }

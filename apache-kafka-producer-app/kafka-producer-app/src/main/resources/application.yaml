@@ -1,4 +1,3 @@
 server.port: 8090
 kafka.bootstrap.servers: ${BOOTSTRAP_SERVERS:localhost:9092}
 kafka.topic.name: ${TOPIC_NAME:ufabc.tcc.topic}
-generate.messages.num: ${GENERATE_MESSAGES_NUM:10}

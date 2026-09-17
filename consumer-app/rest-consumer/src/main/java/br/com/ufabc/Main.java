@@ -29,7 +29,7 @@ class Main {
         @PostMapping
         public ResponseEntity<EventResponse> consumerEvent(@RequestBody EventRequest event) throws InterruptedException {
             IO.println("Starting event consume %s".formatted(event));
-            Thread.sleep(3_000);
+            Thread.sleep(2_000);
             IO.println("Event processed %s".formatted(event));
             return ResponseEntity.ok(new EventResponse("Event Processed"));
         }

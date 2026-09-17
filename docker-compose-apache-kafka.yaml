@@ -63,13 +63,13 @@ services:
       BOOTSTRAP_SERVERS: broker:29092
       TOPIC_NAME: ufabc.tcc.topic
       GROUP_ID: ufabc.consumer
-      OFFSET_RESET_CONFIG: earliest
-      POLL_FREQUENCY_MILLIS: 2000
+      OFFSET_RESET_CONFIG: latest
+      POLL_FREQUENCY_MILLIS: 10000
     deploy:
       resources:
         limits:
           cpus: 1
-          memory: 128m
+          memory: 90m
     networks:
       - kafka-network
     depends_on:

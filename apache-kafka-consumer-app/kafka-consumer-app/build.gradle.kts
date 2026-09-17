@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     implementation("org.apache.kafka:kafka-clients:4.3.1")
+    implementation("tools.jackson.core:jackson-databind:3.2.2")
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -30,5 +31,6 @@ tasks.jar {
         )
     }
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 

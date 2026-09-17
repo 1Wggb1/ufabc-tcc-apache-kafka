@@ -6,6 +6,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,34 +25,40 @@ class Main {
     @RestController
     @RequestMapping("/produces")
     public static class ProducesController {
-        private final String bootstrapServers;
         private final String topic;
         private final AtomicInteger requestNumber;
+        private final KafkaProducer<String, String> producer;
 
         public ProducesController(@Value(value = "${kafka.bootstrap.servers}") String bootstrapServers,
                                   @Value(value = "${kafka.topic.name}") String topic) {
-            this.bootstrapServers = bootstrapServers;
             this.topic = topic;
             this.requestNumber = new AtomicInteger();
-        }
-
-        @PostMapping
-        public ResponseEntity<String> print(){
             Properties properties = new Properties();
             properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
             properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
             properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-            KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
+            this.producer = new KafkaProducer<>(properties);
+        }
+
+        @PostMapping
+        public ResponseEntity<String> producesEvents(){
+            IO.println("Starting event producer. Generating event %s".formatted(requestNumber.addAndGet(1)));
             String payload = """
                     {
                         "sku": "%s"
                     }
                     """.formatted(requestNumber.addAndGet(1));
             ProducerRecord<String, String> producerRecord = new ProducerRecord<>(topic, "" + requestNumber.get(), payload);
-            doSend(producer, producerRecord);
-            producer.flush();
-            producer.close();
-            return ResponseEntity.ok("produces");
+            try {
+                doSend(producer, producerRecord);
+                IO.println("Event %s produced successfully".formatted(payload));
+            } catch (Exception e){
+                IO.println("Exception %s in event %s".formatted(e.getMessage(), payload));
+                return ResponseEntity.status(HttpStatusCode.valueOf(504)).build();
+            } finally {
+                producer.flush();
+            }
+            return ResponseEntity.ok("produced");
         }
 
         private static void doSend(KafkaProducer<String, String> producer, ProducerRecord<String, String> producerRecord) {
@@ -64,7 +71,7 @@ class Main {
                             "Timestamp: " + recordMetadata.timestamp());
                     return;
                 }
-                IO.println("Error while producing %s".formatted(e.getMessage()));
+                throw new IllegalStateException(e);
             });
         }
     }

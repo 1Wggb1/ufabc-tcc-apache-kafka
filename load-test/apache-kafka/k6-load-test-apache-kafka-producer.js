@@ -7,9 +7,9 @@ const requests = [
 
 export const options = {
   stages: [
-    { duration: '10s', target: 100 },
-    { duration: '5s', target: 100 },
-    { duration: '5s', target: 0 },
+    { duration: '10s', target: 200 },
+    { duration: '15s', target: 200 },
+    { duration: '10s', target: 0 },
   ],
   thresholds: Object.fromEntries(
     ['http_req_duration', 'http_reqs', 'http_req_failed']

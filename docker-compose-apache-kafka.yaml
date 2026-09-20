@@ -64,7 +64,8 @@ services:
       TOPIC_NAME: ufabc.tcc.topic
       GROUP_ID: ufabc.consumer
       OFFSET_RESET_CONFIG: latest
-      POLL_FREQUENCY_MILLIS: 10000
+      MAX_POLL_RECORDS: 100
+      POLL_FREQUENCY_MILLIS: 250000
     deploy:
       resources:
         limits:

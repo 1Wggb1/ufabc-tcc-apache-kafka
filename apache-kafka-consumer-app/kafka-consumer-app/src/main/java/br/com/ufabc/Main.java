@@ -49,6 +49,8 @@ class Main {
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         String offsetResetConfig = System.getenv("OFFSET_RESET_CONFIG");
         properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, offsetResetConfig);
+        String maxPollRecordsConfig = System.getenv("MAX_POLL_RECORDS");
+        properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecordsConfig);
         return new KafkaConsumer<>(properties);
     }
 }

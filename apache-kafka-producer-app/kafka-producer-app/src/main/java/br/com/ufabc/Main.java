@@ -42,13 +42,14 @@ class Main {
 
         @PostMapping
         public ResponseEntity<String> producesEvents(){
-            IO.println("Starting event producer. Generating event %s".formatted(requestNumber.addAndGet(1)));
+            int request = requestNumber.addAndGet(1);
+            IO.println("Starting event producer. Generating event %s".formatted(request));
             String payload = """
                     {
                         "sku": "%s"
                     }
-                    """.formatted(requestNumber.addAndGet(1));
-            ProducerRecord<String, String> producerRecord = new ProducerRecord<>(topic, "" + requestNumber.get(), payload);
+                    """.formatted(request);
+            ProducerRecord<String, String> producerRecord = new ProducerRecord<>(topic, "" + request, payload);
             try {
                 doSend(producer, producerRecord);
                 IO.println("Event %s produced successfully".formatted(payload));

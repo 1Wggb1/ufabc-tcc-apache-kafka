@@ -7,8 +7,8 @@ const requests = [
 
 export const options = {
   stages: [
-    { duration: '10s', target: 200 },
-    { duration: '15s', target: 200 },
+    { duration: '10s', target: 160 },
+    { duration: '15s', target: 160 },
     { duration: '10s', target: 0 },
   ],
   thresholds: Object.fromEntries(

@@ -1,0 +1,541 @@
+[
+  {
+    "timestamp": "2026-09-20 12:19:01",
+    "container": "26155891e3a92844b25f5b44514fd26978e3303c99e4cdef598643e88d39f91d",
+    "name": "consumer-app",
+    "cpu": "0.68%",
+    "mem": "86.27%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:01",
+    "container": "85daab3c7fcfc3b65f108a2b373dc2a329fd6be861e0364af688be4935d6c49e",
+    "name": "producer-app",
+    "cpu": "0.09%",
+    "mem": "98.93%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:01",
+    "container": "876054d60ad7ee8423f8442e12db89af1aec1c50b76f6be3e2c636356bfdb3fc",
+    "name": "kafka-cluster-ui",
+    "cpu": "0.19%",
+    "mem": "2.38%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:01",
+    "container": "cb65b1e3f27b883f1a770d1f28b08e7fd70c4ccfb603a50c0987daa6100deeb5",
+    "name": "broker",
+    "cpu": "3.83%",
+    "mem": "3.50%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:06",
+    "container": "26155891e3a92844b25f5b44514fd26978e3303c99e4cdef598643e88d39f91d",
+    "name": "consumer-app",
+    "cpu": "1.08%",
+    "mem": "87.14%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:06",
+    "container": "85daab3c7fcfc3b65f108a2b373dc2a329fd6be861e0364af688be4935d6c49e",
+    "name": "producer-app",
+    "cpu": "0.14%",
+    "mem": "98.93%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:06",
+    "container": "876054d60ad7ee8423f8442e12db89af1aec1c50b76f6be3e2c636356bfdb3fc",
+    "name": "kafka-cluster-ui",
+    "cpu": "0.18%",
+    "mem": "2.38%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:06",
+    "container": "cb65b1e3f27b883f1a770d1f28b08e7fd70c4ccfb603a50c0987daa6100deeb5",
+    "name": "broker",
+    "cpu": "6.82%",
+    "mem": "3.51%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:10",
+    "container": "26155891e3a92844b25f5b44514fd26978e3303c99e4cdef598643e88d39f91d",
+    "name": "consumer-app",
+    "cpu": "0.42%",
+    "mem": "86.94%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:10",
+    "container": "85daab3c7fcfc3b65f108a2b373dc2a329fd6be861e0364af688be4935d6c49e",
+    "name": "producer-app",
+    "cpu": "0.08%",
+    "mem": "98.93%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:10",
+    "container": "876054d60ad7ee8423f8442e12db89af1aec1c50b76f6be3e2c636356bfdb3fc",
+    "name": "kafka-cluster-ui",
+    "cpu": "0.15%",
+    "mem": "2.38%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:10",
+    "container": "cb65b1e3f27b883f1a770d1f28b08e7fd70c4ccfb603a50c0987daa6100deeb5",
+    "name": "broker",
+    "cpu": "27.22%",
+    "mem": "3.55%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:14",
+    "container": "26155891e3a92844b25f5b44514fd26978e3303c99e4cdef598643e88d39f91d",
+    "name": "consumer-app",
+    "cpu": "2.57%",
+    "mem": "86.40%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:14",
+    "container": "85daab3c7fcfc3b65f108a2b373dc2a329fd6be861e0364af688be4935d6c49e",
+    "name": "producer-app",
+    "cpu": "0.71%",
+    "mem": "99.14%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:14",
+    "container": "876054d60ad7ee8423f8442e12db89af1aec1c50b76f6be3e2c636356bfdb3fc",
+    "name": "kafka-cluster-ui",
+    "cpu": "0.20%",
+    "mem": "2.38%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:14",
+    "container": "cb65b1e3f27b883f1a770d1f28b08e7fd70c4ccfb603a50c0987daa6100deeb5",
+    "name": "broker",
+    "cpu": "4.07%",
+    "mem": "3.50%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:18",
+    "container": "26155891e3a92844b25f5b44514fd26978e3303c99e4cdef598643e88d39f91d",
+    "name": "consumer-app",
+    "cpu": "0.56%",
+    "mem": "86.70%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:18",
+    "container": "85daab3c7fcfc3b65f108a2b373dc2a329fd6be861e0364af688be4935d6c49e",
+    "name": "producer-app",
+    "cpu": "108.52%",
+    "mem": "99.99%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:18",
+    "container": "876054d60ad7ee8423f8442e12db89af1aec1c50b76f6be3e2c636356bfdb3fc",
+    "name": "kafka-cluster-ui",
+    "cpu": "8.00%",
+    "mem": "2.38%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:18",
+    "container": "cb65b1e3f27b883f1a770d1f28b08e7fd70c4ccfb603a50c0987daa6100deeb5",
+    "name": "broker",
+    "cpu": "3.91%",
+    "mem": "3.51%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:18",
+    "container": "01e41a1418c2c86fb403564e4f2e58909026f08340f794eccd23cf098c0c7816",
+    "name": "vigilant_blackburn",
+    "cpu": "5.16%",
+    "mem": "0.31%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:22",
+    "container": "01e41a1418c2c86fb403564e4f2e58909026f08340f794eccd23cf098c0c7816",
+    "name": "vigilant_blackburn",
+    "cpu": "17.84%",
+    "mem": "0.36%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:22",
+    "container": "26155891e3a92844b25f5b44514fd26978e3303c99e4cdef598643e88d39f91d",
+    "name": "consumer-app",
+    "cpu": "2.04%",
+    "mem": "93.23%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:22",
+    "container": "85daab3c7fcfc3b65f108a2b373dc2a329fd6be861e0364af688be4935d6c49e",
+    "name": "producer-app",
+    "cpu": "100.14%",
+    "mem": "99.97%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:22",
+    "container": "876054d60ad7ee8423f8442e12db89af1aec1c50b76f6be3e2c636356bfdb3fc",
+    "name": "kafka-cluster-ui",
+    "cpu": "0.18%",
+    "mem": "2.38%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:22",
+    "container": "cb65b1e3f27b883f1a770d1f28b08e7fd70c4ccfb603a50c0987daa6100deeb5",
+    "name": "broker",
+    "cpu": "23.53%",
+    "mem": "3.64%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:26",
+    "container": "01e41a1418c2c86fb403564e4f2e58909026f08340f794eccd23cf098c0c7816",
+    "name": "vigilant_blackburn",
+    "cpu": "20.37%",
+    "mem": "0.45%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:26",
+    "container": "26155891e3a92844b25f5b44514fd26978e3303c99e4cdef598643e88d39f91d",
+    "name": "consumer-app",
+    "cpu": "0.29%",
+    "mem": "92.97%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:26",
+    "container": "85daab3c7fcfc3b65f108a2b373dc2a329fd6be861e0364af688be4935d6c49e",
+    "name": "producer-app",
+    "cpu": "97.42%",
+    "mem": "99.61%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:26",
+    "container": "876054d60ad7ee8423f8442e12db89af1aec1c50b76f6be3e2c636356bfdb3fc",
+    "name": "kafka-cluster-ui",
+    "cpu": "0.17%",
+    "mem": "2.38%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:26",
+    "container": "cb65b1e3f27b883f1a770d1f28b08e7fd70c4ccfb603a50c0987daa6100deeb5",
+    "name": "broker",
+    "cpu": "32.93%",
+    "mem": "3.58%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:30",
+    "container": "01e41a1418c2c86fb403564e4f2e58909026f08340f794eccd23cf098c0c7816",
+    "name": "vigilant_blackburn",
+    "cpu": "18.73%",
+    "mem": "0.46%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:30",
+    "container": "26155891e3a92844b25f5b44514fd26978e3303c99e4cdef598643e88d39f91d",
+    "name": "consumer-app",
+    "cpu": "0.42%",
+    "mem": "92.97%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:30",
+    "container": "85daab3c7fcfc3b65f108a2b373dc2a329fd6be861e0364af688be4935d6c49e",
+    "name": "producer-app",
+    "cpu": "105.42%",
+    "mem": "99.80%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:30",
+    "container": "876054d60ad7ee8423f8442e12db89af1aec1c50b76f6be3e2c636356bfdb3fc",
+    "name": "kafka-cluster-ui",
+    "cpu": "0.18%",
+    "mem": "2.38%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:30",
+    "container": "cb65b1e3f27b883f1a770d1f28b08e7fd70c4ccfb603a50c0987daa6100deeb5",
+    "name": "broker",
+    "cpu": "8.51%",
+    "mem": "3.52%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:34",
+    "container": "01e41a1418c2c86fb403564e4f2e58909026f08340f794eccd23cf098c0c7816",
+    "name": "vigilant_blackburn",
+    "cpu": "24.31%",
+    "mem": "0.51%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:34",
+    "container": "26155891e3a92844b25f5b44514fd26978e3303c99e4cdef598643e88d39f91d",
+    "name": "consumer-app",
+    "cpu": "0.31%",
+    "mem": "92.98%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:34",
+    "container": "85daab3c7fcfc3b65f108a2b373dc2a329fd6be861e0364af688be4935d6c49e",
+    "name": "producer-app",
+    "cpu": "98.04%",
+    "mem": "99.85%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:34",
+    "container": "876054d60ad7ee8423f8442e12db89af1aec1c50b76f6be3e2c636356bfdb3fc",
+    "name": "kafka-cluster-ui",
+    "cpu": "0.17%",
+    "mem": "2.38%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:34",
+    "container": "cb65b1e3f27b883f1a770d1f28b08e7fd70c4ccfb603a50c0987daa6100deeb5",
+    "name": "broker",
+    "cpu": "11.13%",
+    "mem": "3.53%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:39",
+    "container": "01e41a1418c2c86fb403564e4f2e58909026f08340f794eccd23cf098c0c7816",
+    "name": "vigilant_blackburn",
+    "cpu": "22.51%",
+    "mem": "0.52%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:39",
+    "container": "26155891e3a92844b25f5b44514fd26978e3303c99e4cdef598643e88d39f91d",
+    "name": "consumer-app",
+    "cpu": "0.45%",
+    "mem": "93.30%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:39",
+    "container": "85daab3c7fcfc3b65f108a2b373dc2a329fd6be861e0364af688be4935d6c49e",
+    "name": "producer-app",
+    "cpu": "99.23%",
+    "mem": "99.50%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:39",
+    "container": "876054d60ad7ee8423f8442e12db89af1aec1c50b76f6be3e2c636356bfdb3fc",
+    "name": "kafka-cluster-ui",
+    "cpu": "0.20%",
+    "mem": "2.38%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:39",
+    "container": "cb65b1e3f27b883f1a770d1f28b08e7fd70c4ccfb603a50c0987daa6100deeb5",
+    "name": "broker",
+    "cpu": "8.68%",
+    "mem": "3.52%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:43",
+    "container": "01e41a1418c2c86fb403564e4f2e58909026f08340f794eccd23cf098c0c7816",
+    "name": "vigilant_blackburn",
+    "cpu": "23.91%",
+    "mem": "0.54%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:43",
+    "container": "26155891e3a92844b25f5b44514fd26978e3303c99e4cdef598643e88d39f91d",
+    "name": "consumer-app",
+    "cpu": "0.28%",
+    "mem": "93.30%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:43",
+    "container": "85daab3c7fcfc3b65f108a2b373dc2a329fd6be861e0364af688be4935d6c49e",
+    "name": "producer-app",
+    "cpu": "99.55%",
+    "mem": "99.50%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:43",
+    "container": "876054d60ad7ee8423f8442e12db89af1aec1c50b76f6be3e2c636356bfdb3fc",
+    "name": "kafka-cluster-ui",
+    "cpu": "0.17%",
+    "mem": "2.38%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:43",
+    "container": "cb65b1e3f27b883f1a770d1f28b08e7fd70c4ccfb603a50c0987daa6100deeb5",
+    "name": "broker",
+    "cpu": "20.85%",
+    "mem": "3.56%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:47",
+    "container": "01e41a1418c2c86fb403564e4f2e58909026f08340f794eccd23cf098c0c7816",
+    "name": "vigilant_blackburn",
+    "cpu": "17.40%",
+    "mem": "0.54%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:47",
+    "container": "26155891e3a92844b25f5b44514fd26978e3303c99e4cdef598643e88d39f91d",
+    "name": "consumer-app",
+    "cpu": "0.37%",
+    "mem": "93.03%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:47",
+    "container": "85daab3c7fcfc3b65f108a2b373dc2a329fd6be861e0364af688be4935d6c49e",
+    "name": "producer-app",
+    "cpu": "103.95%",
+    "mem": "99.77%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:47",
+    "container": "876054d60ad7ee8423f8442e12db89af1aec1c50b76f6be3e2c636356bfdb3fc",
+    "name": "kafka-cluster-ui",
+    "cpu": "0.16%",
+    "mem": "2.38%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:47",
+    "container": "cb65b1e3f27b883f1a770d1f28b08e7fd70c4ccfb603a50c0987daa6100deeb5",
+    "name": "broker",
+    "cpu": "37.02%",
+    "mem": "3.66%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:51",
+    "container": "01e41a1418c2c86fb403564e4f2e58909026f08340f794eccd23cf098c0c7816",
+    "name": "vigilant_blackburn",
+    "cpu": "5.39%",
+    "mem": "0.54%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:51",
+    "container": "26155891e3a92844b25f5b44514fd26978e3303c99e4cdef598643e88d39f91d",
+    "name": "consumer-app",
+    "cpu": "0.32%",
+    "mem": "93.03%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:51",
+    "container": "85daab3c7fcfc3b65f108a2b373dc2a329fd6be861e0364af688be4935d6c49e",
+    "name": "producer-app",
+    "cpu": "74.50%",
+    "mem": "99.85%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:51",
+    "container": "876054d60ad7ee8423f8442e12db89af1aec1c50b76f6be3e2c636356bfdb3fc",
+    "name": "kafka-cluster-ui",
+    "cpu": "0.14%",
+    "mem": "2.38%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:51",
+    "container": "cb65b1e3f27b883f1a770d1f28b08e7fd70c4ccfb603a50c0987daa6100deeb5",
+    "name": "broker",
+    "cpu": "16.84%",
+    "mem": "3.55%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:55",
+    "container": "26155891e3a92844b25f5b44514fd26978e3303c99e4cdef598643e88d39f91d",
+    "name": "consumer-app",
+    "cpu": "0.29%",
+    "mem": "93.03%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:55",
+    "container": "85daab3c7fcfc3b65f108a2b373dc2a329fd6be861e0364af688be4935d6c49e",
+    "name": "producer-app",
+    "cpu": "0.09%",
+    "mem": "99.52%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:55",
+    "container": "876054d60ad7ee8423f8442e12db89af1aec1c50b76f6be3e2c636356bfdb3fc",
+    "name": "kafka-cluster-ui",
+    "cpu": "0.23%",
+    "mem": "2.38%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:55",
+    "container": "cb65b1e3f27b883f1a770d1f28b08e7fd70c4ccfb603a50c0987daa6100deeb5",
+    "name": "broker",
+    "cpu": "3.57%",
+    "mem": "3.53%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:59",
+    "container": "26155891e3a92844b25f5b44514fd26978e3303c99e4cdef598643e88d39f91d",
+    "name": "consumer-app",
+    "cpu": "0.41%",
+    "mem": "93.31%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:59",
+    "container": "85daab3c7fcfc3b65f108a2b373dc2a329fd6be861e0364af688be4935d6c49e",
+    "name": "producer-app",
+    "cpu": "0.10%",
+    "mem": "99.36%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:59",
+    "container": "876054d60ad7ee8423f8442e12db89af1aec1c50b76f6be3e2c636356bfdb3fc",
+    "name": "kafka-cluster-ui",
+    "cpu": "0.19%",
+    "mem": "2.38%"
+  },
+  {
+    "timestamp": "2026-09-20 12:19:59",
+    "container": "cb65b1e3f27b883f1a770d1f28b08e7fd70c4ccfb603a50c0987daa6100deeb5",
+    "name": "broker",
+    "cpu": "3.20%",
+    "mem": "3.53%"
+  },
+  {
+    "timestamp": "2026-09-20 12:20:03",
+    "container": "26155891e3a92844b25f5b44514fd26978e3303c99e4cdef598643e88d39f91d",
+    "name": "consumer-app",
+    "cpu": "0.61%",
+    "mem": "93.31%"
+  },
+  {
+    "timestamp": "2026-09-20 12:20:03",
+    "container": "85daab3c7fcfc3b65f108a2b373dc2a329fd6be861e0364af688be4935d6c49e",
+    "name": "producer-app",
+    "cpu": "0.09%",
+    "mem": "99.75%"
+  },
+  {
+    "timestamp": "2026-09-20 12:20:03",
+    "container": "876054d60ad7ee8423f8442e12db89af1aec1c50b76f6be3e2c636356bfdb3fc",
+    "name": "kafka-cluster-ui",
+    "cpu": "0.21%",
+    "mem": "2.38%"
+  },
+  {
+    "timestamp": "2026-09-20 12:20:03",
+    "container": "cb65b1e3f27b883f1a770d1f28b08e7fd70c4ccfb603a50c0987daa6100deeb5",
+    "name": "broker",
+    "cpu": "3.10%",
+    "mem": "3.53%"
+  },
+  {
+    "timestamp": "2026-09-20 12:20:08",
+    "container": "26155891e3a92844b25f5b44514fd26978e3303c99e4cdef598643e88d39f91d",
+    "name": "--",
+    "cpu": "--",
+    "mem": "--"
+  },
+  {
+    "timestamp": "2026-09-20 12:20:08",
+    "container": "85daab3c7fcfc3b65f108a2b373dc2a329fd6be861e0364af688be4935d6c49e",
+    "name": "--",
+    "cpu": "--",
+    "mem": "--"
+  },
+  {
+    "timestamp": "2026-09-20 12:20:08",
+    "container": "876054d60ad7ee8423f8442e12db89af1aec1c50b76f6be3e2c636356bfdb3fc",
+    "name": "--",
+    "cpu": "--",
+    "mem": "--"
+  },
+  {
+    "timestamp": "2026-09-20 12:20:08",
+    "container": "cb65b1e3f27b883f1a770d1f28b08e7fd70c4ccfb603a50c0987daa6100deeb5",
+    "name": "broker",
+    "cpu": "3.75%",
+    "mem": "3.56%"
+  }
+]

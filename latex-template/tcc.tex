@@ -86,7 +86,7 @@
   São as partições do tópicos, em que, os eventos são armazenados nos brokers de um cluster. Os eventos são armazenados nas partições de forma imutável e podem ter o tempo de retenção ilimitado. Diferente de outros sistemas de mensageria, em que, as mensagens são excluídas após o consumo, o Apache Kafka mantém os eventos durante a janela de retenção, podendo ser recuperado a qualquer momento dentro dessa janela. A implementação do backpressure acontece no fato dos eventos serem guardados para futuro processamento sem sobrecarga direta dos consumidores.
 
   \subsubsection{Quotas}
-  Quotas no Apache Kafka permite especificar um limite máximo em Bytes ou consumo de CPU para produtores ou consumidores por segundos. As quotas se aplicam em todos os tópicos dos brokers. No caso dos produtores, o Apache Kafka não rejeita os eventos, mas passa a atrasar as resposta de confirmação, assim evitando o envio de novos eventos. Quando o limite é atingido a aplicação (produtor ou consumidor) recebe uma resposta com o tempo até que o próximo evento possa ser enviado/recuperado, com esse valor a aplicação pode ajustar seus envios/recuperação \cite{conduktorQuotaDerosiaux2026}.
+  Quotas no Apache Kafka permite especificar um limite máximo em Bytes ou consumo de CPU do servidor utilizado por produtores ou consumidores por segundos. As quotas se aplicam em todos os tópicos dos brokers. No caso dos produtores, o Apache Kafka não rejeita os eventos, mas passa a atrasar as respostas de confirmação, assim evitando o envio de novos eventos. Quando o limite é atingido a aplicação (produtor ou consumidor) recebe uma resposta com o tempo até que o próximo evento possa ser enviado/recuperado, com esse valor a aplicação pode ajustar seus envios/recuperação \cite{conduktorQuotaDerosiaux2026}.
 
   \subsubsection{Pub-Sub pull-based}
   Publish-Subscribe (pub-sub) é um padrão assíncrono de mensagens que permite a independência de produtores e consumidores de mensagens pelo desacoplamento. Neste modelo os produtores enviam as mensagens para um servidor intermediário (broker) que armazena as mensagens em uma unidade lógica (tópico) e direciona as mensagens para os consumidores fazerem o processamento. Essa característica permite a independência de escalabilidade deles. O modelo é caracterizado por ser N:N, em que, pode haver N produtores e N consumidores em um mesmo tópico, diferente do modelo de fila (N:1). Existem duas formas de interação com as mensagens no pub-sub, uma baseada no push e outra no pull. No push, quando uma mensagem é publicada no broker pelo produtor, o broker faz o envio para os consumidores do tópico. No pull, os consumidores ativamente de tempos em tempos solicitam ao broker as mensagens dos tópicos, que os mesmos estão escritos, desta forma, os consumidores podem receber as mensagens no tempo que estiverem disponíveis para o processamento, favorecendo o backpressure e a recuperação de batch de mensagens. O Pub-Sub baseado em pull é o modelo utilizado no Apache Kafka \cite{researchGateSagarkar2021}. Diferente do modelo de push que pode gerar sobrecarga nos consumidores, quando a taxa de produção de eventos é maior que a taxa de consumo \cite{apacheKafkaDesign2026}.
@@ -100,23 +100,72 @@
   Este trabalho caracteriza-se como uma pesquisa experimental quantitativa com abordagem comparativa. Trata-se de um experimento controlado, no qual, duas implementações equivalentes de uma aplicação é submetida a cenários de carga parecidos, no qual, são coletadas algumas métricas de desempenho, permitindo entender o backpressure aplicado pela plataforma Apache Kafka, em uma aplicação que a utiliza e a outra não.
 
   \subsection{Métricas dos experimentos}
-  No experimento foram feitas comparações com base nas métricas: throughput (requisições por segundo) e consumo de recursos computacionais, como CPU e Memória RAM.
+  No experimento foram feitas comparações com base nas métricas: throughput (requisições por segundo), latência e consumo de recursos computacionais, como CPU e Memória RAM.
 
   \subsection{Ambiente de execução}
-  Os experimentos foram executados em um ambiente conteinerizado, utilizando o Docker. O host de execução consistiu em uma estação de trabalho com processador Intel Core i5-8265U, 12 GB de memória RAM DDR4 e armazenamento SSD de 512 GB NVMe M.2, operando sob o sistema Ubuntu 24.04.2 LTS.
+  Os experimentos foram executados em um ambiente conteinerizado, utilizando o Docker. O host de execução consistiu em uma estação de trabalho com processador Intel Core i5-8265U, 12 GB de memória RAM DDR4 e armazenamento SSD de 512 GB NVMe M.2, operando sob o sistema Ubuntu 24.04.2 LTS. As ferramentas de suporte incluíram o Docker na versão 29.2.1 para o ambiente de container e k6 versão 1.6.0 para testes de carga. Os contêineres foram restringidos para 1 CPU tanto para consumidores quanto para produtores. E 128MB de memória para os produtores e 90MB de memória consumidores.
 
   \subsection{Planejamento dos experimentos}
   Foram feitos testes de carga em alguns níveis de concorrência para avaliar o comportamento do backpressure aplicado pelo Apache Kafka. Sendo possível avaliar as taxas de requisições com sucesso e com falha, além da saturação das aplicações no ambiente conteinerizado. Nos testes serão explorados os mecanismos que auxiliam no backpressure: buffer, modelo pub-sub, quotas e consumer groups.
 
   \begin{enumerate}
-    \item Buffer: Será avaliado o consumo de CPU e memória de duas aplicações uma aplicação com a utilização do buffer pelo Apache Kafka e outra não
-    \item PubSub: Será avaliado o desacomplamento obtido pelo modelo PubSub
-    \item Quotas
-    \item Consumer Groups
+    \item \textbf{Buffer}: Será avaliado o consumo de CPU e Memória RAM no lado consumidor de duas aplicações. Uma com a utilização do buffer pelo Apache Kafka, em que, o produtor que envia para o Apache Kafka e a aplicação consumidora faz o consumo do evento. E outra sem a utilização do Apache Kafka, em que, o produtor que encaminha as mensagens diretamente para o consumidor. Ambas as aplicações usam o k6 para geração de requições, assim possibilitando analisar como o buffer auxilia na implementação de backpressure. Nos experimentos foram feitos testes exploratórios prévios, que identificou, que a aplicação sem a utilização do Apache Kafka se degrada a partir de 200 usuários simultâneos (Virtual Users - VUs). O planejamento do experimento definiu os seguintes parâmetros:
+    \begin{itemize}
+      \item \textbf{Subida}: Um período inicial de 10 segundos para atingir a carga máxima de 200 VUs;
+      \item \textbf{Estabilidade}: Um período de 15 segundos em carga máxima;
+      \item \textbf{Descida}: Um período de 10 segundos até chegar a 0 VUs;
+      \item \textbf{Intervalo}: Entre as requisições de cada usuário virtual foi adicionado uma pausa de 1 segundo, assim simulando o comportamento de uso mais realista.
+    \end{itemize}
+    \item \textbf{PubSub}: Será avaliado o consumo de CPU e Memória RAM e o throughput fornecido pelo desacomplamento do modelo PubSub entre as aplicações produtoras e consumidoras focando no backpressure.
+
+    O planejamento do experimento definiu os seguintes parâmetros:
+    \begin{itemize}
+      \item \textbf{Subida}: Um período inicial de 10 segundos para atingir a carga máxima de 200 VUs;
+      \item \textbf{Estabilidade}: Um período de 15 segundos em carga máxima;
+      \item \textbf{Descida}: Um período de 10 segundos até chegar a 0 VUs;
+      \item \textbf{Intervalo}: Entre as requisições de cada usuário virtual foi adicionado uma pausa de 1 segundo, assim simulando o comportamento de uso mais realista.
+    \end{itemize}
+    \item \textbf{Quotas}: Será avaliado como o backpressure é aplicado no throughput da aplicação produtora analisando a latência quando limite é atingido.
+
+    O planejamento do experimento definiu os seguintes parâmetros:
+    \begin{itemize}
+      \item \textbf{Subida}: Um período inicial de 10 segundos para atingir a carga máxima de 200 VUs;
+      \item \textbf{Estabilidade}: Um período de 15 segundos em carga máxima;
+      \item \textbf{Descida}: Um período de 10 segundos até chegar a 0 VUs;
+      \item \textbf{Intervalo}: Entre as requisições de cada usuário virtual foi adicionado uma pausa de 1 segundo, assim simulando o comportamento de uso mais realista.
+    \end{itemize}
+    \item \textbf{Consumer Groups}: Será avaliado a quantidade de eventos processados obtido pela escalabilidade dos consumidores.
+
+    O planejamento do experimento definiu os seguintes parâmetros:
+    \begin{itemize}
+      \item \textbf{Subida}: Um período inicial de 10 segundos para atingir a carga máxima de 200 VUs;
+      \item \textbf{Estabilidade}: Um período de 15 segundos em carga máxima;
+      \item \textbf{Descida}: Um período de 10 segundos até chegar a 0 VUs;
+      \item \textbf{Intervalo}: Entre as requisições de cada usuário virtual foi adicionado uma pausa de 1 segundo, assim simulando o comportamento de uso mais realista.
+    \end{itemize}
   \end{enumerate}
 
+  \section{Implementação das Aplicações}
+  A aplicação utilizada foi criada de forma simples, centrada em operações típicas de sistemas web: um endpoint para criação e outro para consulta às entidades produtos e pedidos, expostas por meio de endpoints REST. Elas foram implementadas com escopo funcional equivalente, seguindo a mesma lógica de negócio, tecnologias, conexão com banco de dados, logs e contratos de API. Ambas uma API com os endpoints /products e /orders GET e POST, assegurando que os testes de carga percorrem fluxos idênticos do ponto de vista do cliente. Ambas as aplicações rodam em containers e possui um banco de dados MongoDB utilizado para persistência e retorno dos dados.
+  A distinção reside na organização arquitetural: enquanto a versão monolítica concentra as funcionalidades em um único processo e artefato de implantação, a versão em microsserviços distribui as responsabilidades em contêineres independentes.
 
-  \section{Experimentos}
+  \section{Resultado dos Experimentos}
+
+  \subsection{Buffer}
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{graph-ram-cpu-consumption-by-seconds-load-test-kafka.png}
+    \caption{Consumo com Apache Kafka.}
+    \label{fig:consumeWithKafka}
+  \end{figure}
+
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{graph-ram-cpu-consumption-by-seconds-load-test.png}
+    \caption{Consumo sem Apache Kafka.}
+    \label{fig:consumeWithoutKafka}
+  \end{figure}
+
 
   \section{Conclusão}
 

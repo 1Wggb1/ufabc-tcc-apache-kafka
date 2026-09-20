@@ -1,0 +1,226 @@
+[
+  {
+    "timestamp": "2026-09-20 11:46:01",
+    "container": "d68be9528d889fe259c6d1c1a712e5d2d38d1607cf0202d69121b79b4d54d7c2",
+    "name": "rest-producer-app",
+    "cpu": "0.08%",
+    "mem": "86.53%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:01",
+    "container": "91fe244c156fd468dca5829f3bd0f5eda48eb09f79df9ecf5b80e2d0a0c78a62",
+    "name": "rest-consumer-app",
+    "cpu": "0.08%",
+    "mem": "99.96%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:05",
+    "container": "9de96d2173dbf6516b99ab778ba4523a56af9c3366fbcdb4b0d42fbbcc2b945b",
+    "name": "happy_curie",
+    "cpu": "104.56%",
+    "mem": "0.57%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:05",
+    "container": "d68be9528d889fe259c6d1c1a712e5d2d38d1607cf0202d69121b79b4d54d7c2",
+    "name": "rest-producer-app",
+    "cpu": "101.54%",
+    "mem": "94.65%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:05",
+    "container": "91fe244c156fd468dca5829f3bd0f5eda48eb09f79df9ecf5b80e2d0a0c78a62",
+    "name": "rest-consumer-app",
+    "cpu": "0.08%",
+    "mem": "99.96%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:09",
+    "container": "9de96d2173dbf6516b99ab778ba4523a56af9c3366fbcdb4b0d42fbbcc2b945b",
+    "name": "happy_curie",
+    "cpu": "5.69%",
+    "mem": "0.63%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:09",
+    "container": "d68be9528d889fe259c6d1c1a712e5d2d38d1607cf0202d69121b79b4d54d7c2",
+    "name": "rest-producer-app",
+    "cpu": "101.66%",
+    "mem": "99.96%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:09",
+    "container": "91fe244c156fd468dca5829f3bd0f5eda48eb09f79df9ecf5b80e2d0a0c78a62",
+    "name": "rest-consumer-app",
+    "cpu": "107.55%",
+    "mem": "98.42%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:13",
+    "container": "9de96d2173dbf6516b99ab778ba4523a56af9c3366fbcdb4b0d42fbbcc2b945b",
+    "name": "happy_curie",
+    "cpu": "6.58%",
+    "mem": "0.67%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:13",
+    "container": "d68be9528d889fe259c6d1c1a712e5d2d38d1607cf0202d69121b79b4d54d7c2",
+    "name": "rest-producer-app",
+    "cpu": "84.95%",
+    "mem": "99.92%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:13",
+    "container": "91fe244c156fd468dca5829f3bd0f5eda48eb09f79df9ecf5b80e2d0a0c78a62",
+    "name": "rest-consumer-app",
+    "cpu": "101.72%",
+    "mem": "99.97%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:17",
+    "container": "9de96d2173dbf6516b99ab778ba4523a56af9c3366fbcdb4b0d42fbbcc2b945b",
+    "name": "happy_curie",
+    "cpu": "1.24%",
+    "mem": "0.68%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:17",
+    "container": "d68be9528d889fe259c6d1c1a712e5d2d38d1607cf0202d69121b79b4d54d7c2",
+    "name": "rest-producer-app",
+    "cpu": "0.12%",
+    "mem": "99.87%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:17",
+    "container": "91fe244c156fd468dca5829f3bd0f5eda48eb09f79df9ecf5b80e2d0a0c78a62",
+    "name": "rest-consumer-app",
+    "cpu": "97.84%",
+    "mem": "99.87%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:21",
+    "container": "9de96d2173dbf6516b99ab778ba4523a56af9c3366fbcdb4b0d42fbbcc2b945b",
+    "name": "happy_curie",
+    "cpu": "1.25%",
+    "mem": "0.68%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:21",
+    "container": "d68be9528d889fe259c6d1c1a712e5d2d38d1607cf0202d69121b79b4d54d7c2",
+    "name": "rest-producer-app",
+    "cpu": "1.40%",
+    "mem": "97.42%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:21",
+    "container": "91fe244c156fd468dca5829f3bd0f5eda48eb09f79df9ecf5b80e2d0a0c78a62",
+    "name": "rest-consumer-app",
+    "cpu": "101.42%",
+    "mem": "99.97%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:25",
+    "container": "9de96d2173dbf6516b99ab778ba4523a56af9c3366fbcdb4b0d42fbbcc2b945b",
+    "name": "happy_curie",
+    "cpu": "14.28%",
+    "mem": "0.71%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:25",
+    "container": "d68be9528d889fe259c6d1c1a712e5d2d38d1607cf0202d69121b79b4d54d7c2",
+    "name": "rest-producer-app",
+    "cpu": "108.94%",
+    "mem": "99.96%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:25",
+    "container": "91fe244c156fd468dca5829f3bd0f5eda48eb09f79df9ecf5b80e2d0a0c78a62",
+    "name": "rest-consumer-app",
+    "cpu": "95.37%",
+    "mem": "100.00%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:29",
+    "container": "9de96d2173dbf6516b99ab778ba4523a56af9c3366fbcdb4b0d42fbbcc2b945b",
+    "name": "happy_curie",
+    "cpu": "0.95%",
+    "mem": "0.71%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:29",
+    "container": "d68be9528d889fe259c6d1c1a712e5d2d38d1607cf0202d69121b79b4d54d7c2",
+    "name": "rest-producer-app",
+    "cpu": "40.31%",
+    "mem": "99.89%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:29",
+    "container": "91fe244c156fd468dca5829f3bd0f5eda48eb09f79df9ecf5b80e2d0a0c78a62",
+    "name": "rest-consumer-app",
+    "cpu": "99.79%",
+    "mem": "99.77%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:33",
+    "container": "9de96d2173dbf6516b99ab778ba4523a56af9c3366fbcdb4b0d42fbbcc2b945b",
+    "name": "happy_curie",
+    "cpu": "11.93%",
+    "mem": "0.72%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:33",
+    "container": "d68be9528d889fe259c6d1c1a712e5d2d38d1607cf0202d69121b79b4d54d7c2",
+    "name": "rest-producer-app",
+    "cpu": "82.74%",
+    "mem": "99.84%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:37",
+    "container": "9de96d2173dbf6516b99ab778ba4523a56af9c3366fbcdb4b0d42fbbcc2b945b",
+    "name": "happy_curie",
+    "cpu": "3.48%",
+    "mem": "0.73%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:37",
+    "container": "d68be9528d889fe259c6d1c1a712e5d2d38d1607cf0202d69121b79b4d54d7c2",
+    "name": "rest-producer-app",
+    "cpu": "38.13%",
+    "mem": "99.95%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:41",
+    "container": "9de96d2173dbf6516b99ab778ba4523a56af9c3366fbcdb4b0d42fbbcc2b945b",
+    "name": "happy_curie",
+    "cpu": "5.11%",
+    "mem": "0.73%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:41",
+    "container": "d68be9528d889fe259c6d1c1a712e5d2d38d1607cf0202d69121b79b4d54d7c2",
+    "name": "rest-producer-app",
+    "cpu": "0.71%",
+    "mem": "96.67%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:46",
+    "container": "d68be9528d889fe259c6d1c1a712e5d2d38d1607cf0202d69121b79b4d54d7c2",
+    "name": "rest-producer-app",
+    "cpu": "0.10%",
+    "mem": "97.55%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:49",
+    "container": "d68be9528d889fe259c6d1c1a712e5d2d38d1607cf0202d69121b79b4d54d7c2",
+    "name": "rest-producer-app",
+    "cpu": "0.10%",
+    "mem": "97.92%"
+  },
+  {
+    "timestamp": "2026-09-20 11:46:52",
+    "container": "d68be9528d889fe259c6d1c1a712e5d2d38d1607cf0202d69121b79b4d54d7c2",
+    "name": "rest-producer-app",
+    "cpu": "0.09%",
+    "mem": "98.11%"
+  }
+]

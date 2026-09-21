@@ -109,63 +109,46 @@
   Foram feitos testes de carga em alguns níveis de concorrência para avaliar o comportamento do backpressure aplicado pelo Apache Kafka. Sendo possível avaliar as taxas de requisições com sucesso e com falha, além da saturação das aplicações no ambiente conteinerizado. Nos testes serão explorados os mecanismos que auxiliam no backpressure: buffer, modelo pub-sub, quotas e consumer groups.
 
   \begin{enumerate}
-    \item \textbf{Buffer}: Será avaliado o consumo de CPU e Memória RAM no lado consumidor de duas aplicações. Uma com a utilização do buffer pelo Apache Kafka, em que, o produtor que envia para o Apache Kafka e a aplicação consumidora faz o consumo do evento. E outra sem a utilização do Apache Kafka, em que, o produtor que encaminha as mensagens diretamente para o consumidor. Ambas as aplicações usam o k6 para geração de requições, assim possibilitando analisar como o buffer auxilia na implementação de backpressure. Nos experimentos foram feitos testes exploratórios prévios, que identificou, que a aplicação sem a utilização do Apache Kafka se degrada a partir de 200 usuários simultâneos (Virtual Users - VUs). O planejamento do experimento definiu os seguintes parâmetros:
+    \item \textbf{Buffer e Pub-Sub}: Será avaliado o consumo de CPU e Memória RAM no lado consumidor de duas aplicações, além do throghput e a latência do lado do produtor. Uma com a utilização do buffer pelo Apache Kafka, em que, o produtor que envia para o Apache Kafka e a aplicação consumidora faz o consumo do evento. E outra sem a utilização do Apache Kafka, em que, o produtor que encaminha as mensagens diretamente para o consumidor. Ambas as aplicações usam o k6 para geração de requições, assim possibilitando analisar como o buffer e o modelo pub-sub auxilia na implementação de backpressure. Nos experimentos foram feitos testes exploratórios prévios, que identificou, que a aplicação sem a utilização do Apache Kafka se degrada a partir de 200 usuários simultâneos (Virtual Users - VUs). O planejamento do experimento definiu os seguintes parâmetros:
     \begin{itemize}
       \item \textbf{Subida}: Um período inicial de 10 segundos para atingir a carga máxima de 200 VUs;
       \item \textbf{Estabilidade}: Um período de 15 segundos em carga máxima;
       \item \textbf{Descida}: Um período de 10 segundos até chegar a 0 VUs;
       \item \textbf{Intervalo}: Entre as requisições de cada usuário virtual foi adicionado uma pausa de 1 segundo, assim simulando o comportamento de uso mais realista.
     \end{itemize}
-    \item \textbf{PubSub}: Será avaliado o consumo de CPU e Memória RAM e o throughput fornecido pelo desacomplamento do modelo PubSub entre as aplicações produtoras e consumidoras focando no backpressure.
 
-    O planejamento do experimento definiu os seguintes parâmetros:
-    \begin{itemize}
-      \item \textbf{Subida}: Um período inicial de 10 segundos para atingir a carga máxima de 200 VUs;
-      \item \textbf{Estabilidade}: Um período de 15 segundos em carga máxima;
-      \item \textbf{Descida}: Um período de 10 segundos até chegar a 0 VUs;
-      \item \textbf{Intervalo}: Entre as requisições de cada usuário virtual foi adicionado uma pausa de 1 segundo, assim simulando o comportamento de uso mais realista.
-    \end{itemize}
     \item \textbf{Quotas}: Será avaliado como o backpressure é aplicado no throughput da aplicação produtora analisando a latência quando limite é atingido.
 
-    O planejamento do experimento definiu os seguintes parâmetros:
-    \begin{itemize}
-      \item \textbf{Subida}: Um período inicial de 10 segundos para atingir a carga máxima de 200 VUs;
-      \item \textbf{Estabilidade}: Um período de 15 segundos em carga máxima;
-      \item \textbf{Descida}: Um período de 10 segundos até chegar a 0 VUs;
-      \item \textbf{Intervalo}: Entre as requisições de cada usuário virtual foi adicionado uma pausa de 1 segundo, assim simulando o comportamento de uso mais realista.
-    \end{itemize}
     \item \textbf{Consumer Groups}: Será avaliado a quantidade de eventos processados obtido pela escalabilidade dos consumidores.
 
-    O planejamento do experimento definiu os seguintes parâmetros:
-    \begin{itemize}
-      \item \textbf{Subida}: Um período inicial de 10 segundos para atingir a carga máxima de 200 VUs;
-      \item \textbf{Estabilidade}: Um período de 15 segundos em carga máxima;
-      \item \textbf{Descida}: Um período de 10 segundos até chegar a 0 VUs;
-      \item \textbf{Intervalo}: Entre as requisições de cada usuário virtual foi adicionado uma pausa de 1 segundo, assim simulando o comportamento de uso mais realista.
-    \end{itemize}
   \end{enumerate}
 
   \section{Implementação das Aplicações}
-  A aplicação utilizada foi criada de forma simples, centrada em operações típicas de sistemas web: um endpoint para criação e outro para consulta às entidades produtos e pedidos, expostas por meio de endpoints REST. Elas foram implementadas com escopo funcional equivalente, seguindo a mesma lógica de negócio, tecnologias, conexão com banco de dados, logs e contratos de API. Ambas uma API com os endpoints /products e /orders GET e POST, assegurando que os testes de carga percorrem fluxos idênticos do ponto de vista do cliente. Ambas as aplicações rodam em containers e possui um banco de dados MongoDB utilizado para persistência e retorno dos dados.
-  A distinção reside na organização arquitetural: enquanto a versão monolítica concentra as funcionalidades em um único processo e artefato de implantação, a versão em microsserviços distribui as responsabilidades em contêineres independentes.
+  Foram feitas duas implementações equivalentes: uma para produtor e outra consumidor. Para produtores foi criado um endpoint (HTTP - POST /produces) para recebimento de requisições para geração de eventos. Para consumidores foi colocado um timeout de 2 segundos simulando um processamento para cada evento/requisição. No cenário de uso do Apache Kafka os consumidores e produtores interagem diretamente com broker para envio e recebimento de eventos, neste cenário, não foi criado o endpoint na aplicação consumidora, pois a interação com broker é feita via polling após a inicialização da aplicação. Já no cenário sem o uso do Apache Kafka as aplicações interagem entre elas diretamentes via HTTP utilizando REST, neste cenário, a aplicação consumidora expõe um endpoint (POST /consumes) para recebimento de requisições do produtor.
+  Nas implementações a distinção existe no fato da interação com Apache Kafka para um dos cenários.
 
   \section{Resultado dos Experimentos}
 
-  \subsection{Buffer}
-  \begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.5\textwidth]{graph-ram-cpu-consumption-by-seconds-load-test-kafka.png}
-    \caption{Consumo com Apache Kafka.}
-    \label{fig:consumeWithKafka}
-  \end{figure}
+  \subsection{Buffer e Pub-Sub}
+  No gráfico da figura \ref{fig:consumeWithoutKafka} há o consumo de CPU e Memória RAM tanto dos produtores quanto dos consumidores, no cenário sem a utilização do Apache Kafka. O experimento contou com um total de 35 segundos de execução dos testes de carga mais alguns segundos iniciais e finais de estabilidade das aplicações. Neste período foram geradas 498 requsições com latência média de 10 segundos e um throughput de cerca de 13 requisições por segundo.
 
+  Analisando o gráfico do experimento, nota-se, um consumo alto de memória na aplicação consumidora desde o início do experimento. Durante o pico de requisições dos testes de carga (aos 25 segundos) a aplicação consumidora chega ao nível máximo de saturação de memória fazendo com que a mesma tenha um colapso após o segundo 29, devido a falta de memória. Já aplicação produtora experimenta uma saturação no consumo de CPU e memória, contudo não chega ao crash, como acontece na aplicação consumidora. No momento de pico a aplicação produtora experimenta 108,94\% de consumo da CPU e cerca de 99\% de consumo de memória. Essa saturação quase instantaneamente satura a aplicação consumidora, devido ao alto acomplamento esse as aplicações. Durante cenário nota-se que com a ausência do backpressure, a aplicação consumidora deveria ter a mesma capacidade de processar as requisições produzidas pela aplicação produtora, para assim, não sofrer com degradação ou crash. Além disso, o crash da aplicação consumidora faz com que as requisições sejam perdidas, não garantindo tolerância a falhas da aplicação.
   \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.5\textwidth]{graph-ram-cpu-consumption-by-seconds-load-test.png}
-    \caption{Consumo sem Apache Kafka.}
+    \caption{Consumo de CPU e Memória RAM no experimento sem Apache Kafka.}
     \label{fig:consumeWithoutKafka}
   \end{figure}
 
+  No gráfico da figura \ref{fig:consumeWithKafka} há um cenário completamente diferente do cenário sem o uso do Apache Kafka. O experimento contou com um total de 35 segundos de execução do teste de carga mais alguns segundos iniciais e finais de estabilidade das aplicações. Neste período foram gerados 3392 eventos com latência média de 0,5 segundos e um throughput de cerca de 95 requsições por segundo.
+
+  Analisando o gráfico do experimento, nota-se que, a aplicação consumidora neste cenário se mostra com um consumo de memória e CPU quase constante durante tudo o experimento. Já aplicação produtora apresenta um pico de CPU de 108,52\% e de memória de 99,99\% aos 18 segundos de experimento. Diferente do cenário sem o Apache Kafka, em que, a aplicação consumidora deveria estar disponível e consumir os requisições na mesma taxa que a aplicação produtora produz, neste, as aplicações são desacopladas pelo modelo pub-sub baseado em pull e pelo buffer na persistência dos eventos no broker (tolerância a falhas). Para cenário sem o Apache Kafka a aplicação consumidora com 90MB não foi suficiente para tratamento das requisições, já no cenário com a ferramenta foi suficiente sem nenhuma saturação. Além disso, durante todo experimento o broker conseguiu lidar com toda carga do produtor e consumidor tendo mínimo consumo de recursos. O backpressure obtido pelas duas abordagens garante a independência de produção e consumo de eventos, permitindo que as aplicações trabalhem em suas respectivas velocidades. Comparando os cenários pelas métricas, a quantidade de eventos produzidos foi cerca de 6,8 vezes maior, que a quantidade de requisições no cenário sem o broker, e o throughput ser cerca 7,3 maior. Demonstrando que com o broker o throughput da aplicação produtora pode ser extremamente maior.
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{graph-ram-cpu-consumption-by-seconds-load-test-kafka.png}
+    \caption{Consumo de CPU e Memória RAM no experimento com Apache Kafka.}
+    \label{fig:consumeWithKafka}
+  \end{figure}
 
   \section{Conclusão}
 

@@ -30,11 +30,13 @@ class Main {
         private final KafkaProducer<String, String> producer;
 
         public ProducesController(@Value(value = "${kafka.bootstrap.servers}") String bootstrapServers,
-                                  @Value(value = "${kafka.topic.name}") String topic) {
+                                  @Value(value = "${kafka.topic.name}") String topic,
+                                  @Value(value = "${producer.client.id}") String clientId) {
             this.topic = topic;
             this.requestNumber = new AtomicInteger();
             Properties properties = new Properties();
             properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+            properties.setProperty(ProducerConfig.CLIENT_ID_CONFIG, clientId);
             properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
             properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
             this.producer = new KafkaProducer<>(properties);

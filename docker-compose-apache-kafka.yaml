@@ -45,6 +45,7 @@ services:
     environment:
       BOOTSTRAP_SERVERS: broker:29092
       TOPIC_NAME: ufabc.tcc.topic
+      CLIENT_ID: ufabc.producer
     deploy:
       resources:
         limits:
@@ -80,4 +81,4 @@ networks:
   kafka-network:
     driver: bridge
 # Apply quota to producer by clientId
-# docker exec -it 75e /opt/kafka/bin/kafka-configs.sh --bootstrap-server localhost:9092 --alter --add-config 'producer_byte_rate=1048' --entity-type clients --entity-name my-producer-app
+# docker exec -it broker /opt/kafka/bin/kafka-configs.sh --bootstrap-server localhost:9092 --alter --add-config 'producer_byte_rate=1048' --entity-type clients --entity-name ufabc.producer

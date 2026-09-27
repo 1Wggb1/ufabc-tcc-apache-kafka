@@ -39,7 +39,7 @@ services:
   producer-app:
     container_name: producer-app
     build:
-      context: ./apache-kafka-producer-app/kafka-producer-app
+      context: ../../apache-kafka-producer-app/kafka-producer-app
     ports:
       - "8090:8090"
     environment:
@@ -59,7 +59,7 @@ services:
   consumer-app:
     container_name: consumer-app
     build:
-      context: ./apache-kafka-consumer-app/kafka-consumer-app
+      context: ../../apache-kafka-consumer-app/kafka-consumer-app
     environment:
       BOOTSTRAP_SERVERS: broker:29092
       TOPIC_NAME: ufabc.tcc.topic
@@ -80,5 +80,3 @@ services:
 networks:
   kafka-network:
     driver: bridge
-# Apply quota to producer by clientId
-# docker exec -it broker /opt/kafka/bin/kafka-configs.sh --bootstrap-server localhost:9092 --alter --add-config 'producer_byte_rate=1048' --entity-type clients --entity-name ufabc.producer

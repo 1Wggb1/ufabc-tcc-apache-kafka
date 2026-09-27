@@ -2,7 +2,7 @@ services:
   rest-producer-app:
     container_name: rest-producer-app
     build:
-      context: ./producer-app/rest-producer
+      context: ../../producer-app/rest-producer
     ports:
       - "8060:8060"
     environment:
@@ -20,7 +20,7 @@ services:
   rest-consumer-app:
     container_name: rest-consumer-app
     build:
-      context: ./consumer-app/rest-consumer
+      context: ../../consumer-app/rest-consumer
     ports:
       - "8070:8070"
     deploy:

@@ -1,7 +1,7 @@
 START_TIME=$(date "+%Y-%m-%d %H:%M:%S")
 echo "[$START_TIME] Starting Quotas Experiment..."
 echo "Starting docker..."
-docker compose up --build -d
+docker compose -f ../docker-compose.yaml up --build -d
 WAIT_SECONDS=15
 echo "Waiting stability... $WAIT_SECONDS seconds"
 sleep $WAIT_SECONDS
@@ -12,7 +12,7 @@ METRICS_TIME=$(date "+%Y-%m-%d %H:%M:%S")
 echo "[$METRICS_TIME] Starting Metrics Collection..."
 sleep 4
 echo "Running k6 load test..."
-docker run --network=quotas-backpressure-comparison_kafka-network --rm -i grafana/k6 run - <k6-load-test-quotas-producer.js
+docker run --network=quotas-backpressure-comparison_kafka-network --rm -i grafana/k6 run - <../k6-load-test-quotas-producer.js
 echo "Waiting stability... $WAIT_SECONDS seconds"
 sleep $WAIT_SECONDS
 END_TIME=$(date "+%Y-%m-%d %H:%M:%S")

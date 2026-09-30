@@ -25,19 +25,20 @@
   \maketitle
 
   \begin{abstract}
-    This article analyzes the theoretical foundations and importance of backpressure strategies using Apache Kafka in distributed systems. The study focuses on an experimental evaluation of Apache Kafka, exploring its backpressure mechanisms—such as buffers, quotas, the pub-sub model, and consumer groups. Through practical experiments with the platform, the importance of backpressure is assessed by comparing an application that utilizes it against one that does not.
+    This article analyzes the theoretical foundations and the importance of backpressure strategies using Apache Kafka in distributed systems. The primary focus of this study is an experimental evaluation of the platform, exploring its native overload control mechanisms—specifically throughput regulation via quotas and consumer groups, as well as peak load absorption through buffers and the pub-sub model.
   \end{abstract}
 
   \begin{resumo}
-    Este artigo analisa os fundamentos teóricos e a importância de estratégias de backpressure com Apache Kafka em sistemas distribuidos. O estudo tem como foco central a avaliação experimental do Apache Kafka, explorando, seus mecanismos de backpressure, como buffer, quotas, modelo pub-sub e consumer groups. Por meio de experimentos práticos com a plataforma são avaliados a importância do backpressure em uma aplicação que a utiliza e outra que não.
+    Este artigo analisa os fundamentos teóricos e a importância de estratégias de backpressure com o Apache Kafka em sistemas distribuídos. O estudo tem como foco central a avaliação experimental da plataforma, explorando seus mecanismos nativos de controle de sobrecarga, pela regulação de vazão mediante quotas e consumer groups, e a absorção de picos de carga por meio de buffers e do modelo pub-sub.
   \end{resumo}
 
 
   \section{Introdução}
+  Em sistemas distribuídos de alta volumetria de dados, é essencial ter mecanismos que ajudem a evitar sobrecarga durante períodos de alta demanda. Diversos mecanismos podem ser empregados para controlar essa sobrecarga, incluindo filas de mensagens, circuit breakers e técnicas de rate limiting. Eles auxiliam os sistemas a continuarem em pleno funcionamento em picos de requisições, sendo exemplos de mecanismos de backpressure. No backpressure, o desacoplamento entre os consumidores e produtores é um ponto muito importante, e muitas vezes provido por filas ou brokers de mensageria, sendo essencial para que os consumidores processem as mensagens de acordo com sua capacidade. Sem esses mecanismos, falhas em cascata, instabilidades e quedas podem acontecer em momentos de alta carga, afetando a confiabilidade do sistema.
 
-  Em sistemas distribuídos de alta volumetria de dados é essencial ter mecanismos que ajudem os sistemas a evitar sobrecarga durante períodos de alta demanda. Diversos mecanismos podem ser empregados para controlar a sobrecarga do sistema, incluindo filas de mensagens, circuit breakers e técnicas de rate limiting. Eles auxiliam os sistemas a lidarem de maneira que continuem em pleno funcionamento em picos de requisições, sendo eles exemplos de mecanismos de backpressure. No backpressure o desacoplamento entre os consumidores e produtores é um ponto muito importante, que é muitas vezes é trazido por filas ou brokers de mensageria sendo vital para consumidores processarem as mensagens de acordo com sua capacidade. Sem mecanismos de backpressure falhas em cascatas, instabilidades e quedas podem acontecer em momentos de alta carga afetando a confiabilidade do sistema. O Apache Kafka é uma plataforma de processamento de streaming bastante utilizada em arquitetura orientada a eventos de alta volumetria, como em e-commerces e instituições financeiras, estando presente em mais de 80\% das empresas da Fortune 100, de acordo com a documentação da plataforma \cite{apacheKafka2026}. A plataforma garante a estabilidade e escalabilidade de aplicações criticas \cite{meissne2018} a partir mecanismos de backpressure nativos, que outras plataformas não fornecem da mesma forma, por não serem robustas igual o Apache Kafka. O modelo de pub-sub baseado em pull, consumers group e partições tornam o Kafka robusto para lidar com até milhões de eventos por segundo.
+  O Apache Kafka é uma plataforma de processamento de streaming bastante utilizada em arquiteturas orientadas a eventos de alta volumetria, como em e-commerces e instituições financeiras, estando presente em mais de 80\% das empresas da Fortune 100, de acordo com a documentação da plataforma \cite{apacheKafka2026}. A plataforma garante a estabilidade e a escalabilidade de aplicações críticas \cite{meissne2018} que outras soluções não fornecem da mesma forma por não serem tão robustas. O modelo pub-sub baseado em pull, consumer groups e partições torna o Kafka robusto para lidar com até milhões de eventos por segundo.
 
-  Este artigo apresenta uma avaliação experimental do Apache Kafka, permitindo o entendimento de alguns mecanismos nativos que auxiliam no backpressure em sistemas distribuidos. O objetivo do artigo é tornar explicito os mecanismos de backpressure presentes na plataforma, pois na literatura há uma carência de artigos que abordam esse tópico.
+  Este artigo apresenta uma avaliação experimental do backpressure no Apache Kafka. O conceito é abordado não apenas como uma sinalização direta entre consumidor e produtor, mas como a capacidade da plataforma em regular a vazão mediante quotas e consumer groups, além de absorver picos de carga por meio de buffers e do modelo pub-sub. Essa abordagem permite a compreensão detalhada dos mecanismos nativos que auxiliam no controle de sobrecarga em sistemas distribuídos. Com isso, o trabalho busca tornar explícitos esses recursos no Apache Kafka, suprindo uma carência literatura de artigos que abordam esse tópico.
 
   \section{Revisão da Literatura} \label{sec:firstpage}
 
@@ -82,8 +83,6 @@
 
 
   \subsection{Mecanismos de Backpressure com Apache Kafka}
-  Neste trabalho define-se backpressure no Apache Kafka não como uma sinalização direta entre consumidor e produtor, mas sim como a capacidade da ferramenta de regulação de vazão (quotas e consumer groups) e absorção de carga (buffer e modelo pub-sub).
-
   \subsubsection{Buffer}
   São as partições do tópicos, em que, os eventos são armazenados nos brokers de um cluster. Os eventos são armazenados nas partições de forma imutável e podem ter o tempo de retenção ilimitado. Diferente de outros sistemas de mensageria, em que, as mensagens são excluídas após o consumo, o Apache Kafka mantém os eventos durante a janela de retenção, podendo ser recuperado a qualquer momento dentro dessa janela. A implementação do backpressure acontece no fato dos eventos serem guardados para futuro processamento sem sobrecarga direta dos consumidores.
 
@@ -91,7 +90,7 @@
   Publish-Subscribe (pub-sub) é um padrão assíncrono de mensagens que permite a independência de produtores e consumidores de mensagens pelo desacoplamento. Neste modelo os produtores enviam as mensagens para um servidor intermediário (broker) que armazena as mensagens em uma unidade lógica (tópico) e direciona as mensagens para os consumidores fazerem o processamento. Essa característica permite a independência de escalabilidade deles. O modelo é caracterizado por ser N:N, no qual pode haver N produtores e N consumidores em um mesmo tópico, diferente do modelo de fila (N:1). Existem duas formas de interação com as mensagens no pub-sub, uma baseada no push e outra no pull. No push, quando uma mensagem é publicada no broker pelo produtor, o broker faz o envio para os consumidores do tópico. No pull, os consumidores ativamente de tempos em tempos solicitam ao broker as mensagens dos tópicos, que os mesmos estão escritos, desta forma, os consumidores podem receber as mensagens no tempo que estiverem disponíveis para o processamento. O Pub-Sub baseado em pull é o modelo utilizado no Apache Kafka \cite{researchGateSagarkar2021}. Diferente do modelo de push que pode gerar sobrecarga nos consumidores, quando a taxa de produção de eventos é maior que a taxa de consumo \cite{apacheKafkaDesign2026}.
 
   \subsubsection{Quotas}
-  Quotas no Apache Kafka permite especificar um limite máximo em Bytes ou consumo de CPU do servidor utilizado por produtores ou consumidores por segundos. As quotas se aplicam em todos os tópicos dos brokers. No caso dos produtores, o Apache Kafka não rejeita os eventos, mas passa a atrasar as respostas de confirmação, assim evitando o envio de novos eventos. Quando o limite é atingido a aplicação (produtor ou consumidor) recebe uma resposta com o tempo até que o próximo evento possa ser enviado/recuperado, com esse valor a aplicação pode ajustar seus envios/recuperação \cite{conduktorQuotaDerosiaux2026}.
+  Quotas no Apache Kafka permite especificar um limite máximo em Bytes ou consumo de CPU do servidor utilizado por produtores ou consumidores por segundos. As quotas se aplicam em todos os tópicos dos brokers. No caso dos produtores, o Apache Kafka não rejeita os eventos, mas passa a atrasar as respostas de confirmação, assim evitando o envio de novos eventos. Quando o limite é atingido a aplicação (produtor ou consumidor) recebe uma resposta com o tempo até que o próximo evento possa ser enviado/recuperado, com esse valor a aplicação pode ajustar seus envios/recuperação \cite{conduktorQuotaDerosiaux2026}. As quotas podem ser configuradas por identificador do grupo, sendo consumidores ou produtores e/ou identificador da aplicação usuária.
 
   \subsubsection{Consumer groups}
   Agrupamento de consumidores que permite a escalabilidade horizontal para o processamento de eventos em paralelo de diferentes partições de um tópico. Cada membro de um grupo é responsável por uma ou mais partições, sem a sobreposição de partições de consumidores de um mesmo grupo \cite{gorshkova2026kafka, conduktorConsumerGroupsDerosiaux2026}. Consumer groups no Apache Kafka atuam passivamente como backpressure pela adição de novos consumidores para escalabilidade de processamento.
@@ -111,9 +110,9 @@
   Foram feitos testes de carga em alguns níveis de concorrência para avaliar o comportamento do backpressure aplicado pelo Apache Kafka. Sendo possível avaliar as taxas de requisições com sucesso e com falha, além da saturação das aplicações no ambiente conteinerizado. Nos testes serão explorados os mecanismos que auxiliam no backpressure: buffer, modelo pub-sub, quotas e consumer groups.
 
   \begin{enumerate}
-    \item \textbf{Buffer e Pub-Sub}: Será avaliado o consumo de CPU e Memória RAM no lado consumidor de duas aplicações, além do throughput e a latência do lado do produtor. A primeira aplicação faz a utilização do pelo Apache Kafka, no qual o produtor envia os eventos para o broker, e a aplicação consumidora faz o processamento. A segunda aplicação opera sem a utilização do Apache Kafka, com o produtor encaminha as mensagens diretamente para o consumidor via HTTP/REST.
+    \item \textbf{Buffer e Pub-Sub}: Foi avaliado o consumo de CPU e Memória RAM no lado consumidor de duas aplicações, além do throughput e a latência do lado do produtor. A primeira aplicação faz a utilização do pelo Apache Kafka, no qual o produtor envia os eventos para o broker, e a aplicação consumidora faz o processamento. A segunda aplicação opera sem a utilização do Apache Kafka, com o produtor encaminhando as mensagens diretamente para o consumidor via HTTP/REST.
 
-    Ambas as aplicações usam o k6 para geração de requisições, possibilitando analisar como o buffer e o modelo pub-sub auxilia na implementação de backpressure (nativamente presentes no Apache Kafka). A ferramenta Apache Kafka foi configurada com 1 broker, fator de replicação 1, 3 partições por tópico, mantendo as demais configurações nos valores padrões definidos pela própria ferramenta. O produtor de evento seguiu as configurações padrões. No caso do consumidor, foi criado um consumer group com apenas uma instância da aplicação consumidora, parametrizado com um limite máximo de 100 eventos em cada poll, um intervalo de execução a cada 250 segundos, e as demais configurações mantendo os valores padrões definidos pela próprio Apache Kafka. Nos experimentos foram feitos testes exploratórios prévios, que identificou, que a aplicação sem a utilização do Apache Kafka se degrada a partir de 200 usuários simultâneos (Virtual Users - VUs). Assim, o planejamento do experimento definiu os seguintes parâmetros:
+    Ambas as aplicações usam a ferramenta k6 para geração de requisições, possibilitando analisar como o buffer e o modelo pub-sub auxilia na implementação de backpressure (nativamente presentes no Apache Kafka). A ferramenta Apache Kafka foi configurada com 1 broker, fator de replicação 1, 3 partições por tópico, mantendo as demais configurações nos valores padrões definidos pela própria ferramenta. O produtor de evento seguiu as configurações padrões. No caso do consumidor, foi criado um consumer group com apenas uma instância da aplicação consumidora, parametrizado com um limite máximo de 100 eventos em cada poll, um intervalo de execução a cada 250 segundos, e as demais configurações mantendo os valores padrões definidos pela próprio Apache Kafka. Nos experimentos foram feitos testes exploratórios prévios, que identificou, que a aplicação sem a utilização do Apache Kafka se degrada a partir de 200 usuários simultâneos (Virtual Users - VUs). Assim, o planejamento do experimento definiu os seguintes parâmetros:
     \begin{itemize}
       \item \textbf{Subida}: Um período inicial de 10 segundos para atingir a carga máxima de 200 VUs;
       \item \textbf{Estabilidade}: Um período de 15 segundos em carga máxima;
@@ -121,7 +120,17 @@
       \item \textbf{Intervalo}: Entre as requisições de cada usuário virtual foi adicionado uma pausa de 1 segundo, assim simulando o comportamento de uso mais realista.
     \end{itemize}
 
-    \item \textbf{Quotas}: Será avaliado como o backpressure é aplicado no throughput da aplicação produtora analisando a latência quando limite é atingido.
+    \item \textbf{Quotas}: Foi avaliado throughput e latência da aplicação produtora em dois cenários. O primeiro a aplicação produtora tem o limite padrão definido pelo Apache Kafka, e no segundo aplicação produtora tem limite de quotas por rede reduzido.
+
+    Em ambos os cenários foi utilizado a ferramenta k6 para geração de requisições. A ferramenta Apache Kafka foi configurada com 1 broker, fator de replicação 1, 3 partições por tópico, quotas de rede por produtor para 1024 bytes (apenas configurado para segundo cenário), mantendo as demais configurações nos valores padrões definidos pela própria ferramenta. Nos experimentos não foi utilizado consumidores.
+    O planejamento do experimento definiu os seguintes parâmetros:
+    \begin{itemize}
+      \item \textbf{Subida}: Um período inicial de 10 segundos para atingir a carga máxima de 200 VUs;
+      \item \textbf{Estabilidade}: Um período de 15 segundos em carga máxima;
+      \item \textbf{Descida}: Um período de 10 segundos até chegar a 0 VUs;
+      \item \textbf{Intervalo}: Entre as requisições de cada usuário virtual foi adicionado uma pausa de 1 segundo, assim simulando o comportamento de uso mais realista.
+    \end{itemize}
+
 
     \item \textbf{Consumer Groups}: Será avaliado a quantidade de eventos processados obtido pela escalabilidade dos consumidores.
 
@@ -137,6 +146,7 @@
   No gráfico da figura \ref{fig:consumeWithoutKafka}, observa-se o consumo de CPU e Memória RAM tanto dos produtores quanto dos consumidores, no cenário sem a utilização do Apache Kafka. O experimento contou com um total de 35 segundos de execução dos testes de carga, além de alguns segundos iniciais e finais para estabilização das aplicações. Neste período foram geradas 498 requisições com latência média de 10 segundos e um throughput de cerca de 13 requisições por segundo.
 
   Analisando o gráfico do experimento, nota-se um consumo elevado de memória na aplicação consumidora desde o início do experimento. Durante o pico de requisições dos testes de carga (aos 25 segundos), a aplicação consumidora atinge o nível máximo de saturação de memória, sofrendo um colapso após o segundo 29 devido a falta de memória. Por sua vez, a aplicação produtora experimenta uma saturação no consumo de CPU e memória, contudo sem chegar ao colapso, como aconteceu na aplicação consumidora. No momento de pico a aplicação produtora experimenta 108,94\% de consumo da CPU e cerca de 99\% de consumo de memória. Essa saturação quase instantaneamente satura a aplicação consumidora, devido ao alto acoplamento entre as aplicações. Neste cenário, nota-se que, com a ausência do backpressure (pelo buffer e o modelo pub-sub), a aplicação consumidora precisaria ter a mesma capacidade de processamento da aplicação produtora, para assim, não sofrer com degradação ou colapso. Além disso, o colapso da aplicação consumidora resulta na perda de requisições, comprometendo a tolerância a falhas da aplicação.
+
   \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.5\textwidth]{graph-ram-cpu-consumption-by-seconds-load-test.png}
@@ -152,12 +162,30 @@
 
   Em termos métricos, a quantidade de eventos produzidos foi cerca de 6,8 vezes maior em comparação com a quantidade de requisições no cenário sem o broker, apresentando um throughput cerca de 7,3 vezes superior. Vale ressaltar que esses ganhos não decorrem exclusivamente do Apache Kafka como ferramenta, mas também da transição de uma arquitetura síncrona para uma arquitetura assíncrona orientada a eventos.
 
-
   \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.5\textwidth]{graph-ram-cpu-consumption-by-seconds-load-test-kafka.png}
     \caption{Consumo de CPU e Memória RAM no experimento com Apache Kafka.}
     \label{fig:consumeWithKafka}
+  \end{figure}
+
+  \subsection{Quotas}
+  No gráfico da figura \ref{fig:quotasThroughputComparison}, observa-se o Throughput dos produtores em ambos os cenários com quotas reduzida para 1KB e com quotas padrão. Os experimentos contaram com um total de 35 segundos de execução dos testes de carga, além de alguns segundos iniciais e finais para estabilização das aplicações.
+
+  Analisando o gráfico dos experimentos, nota-se um throughput cerca de 4 vezes superior na aplicação com quota padrão do que a aplicação com a quota reduzida. A quota reduzido fez com que a aplicação gerasse 1056 eventos para o broker, enquanto a aplicação sem quotas gerou 4038. É redução é notada junto a uma latência superior na aplicação utilizando quotas. O Apache Kafka passa a atrasar a resposta ao produtor o que faz com que o mesmo passe a reduzir a quantidade de eventos até receber a confirmação dos enviado, assim, essa configuração faz com que o backpressure seja aplicado a nível geral de sistema/broker, controlando a utilização de recursos que podem afetar outros usuários do broker.
+
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{quotas-throughput-comparison.png}
+    \caption{Comparação entre Throughput entre cenários.}
+    \label{fig:quotasThroughputComparison}
+  \end{figure}
+
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{quotas-latency-comparison.png}
+    \caption{Comparação entre latência entre cenários.}
+    \label{fig:quotasLatencyComparison}
   \end{figure}
 
   \section{Conclusão}

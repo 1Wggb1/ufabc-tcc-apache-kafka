@@ -110,7 +110,7 @@
   Foram feitos testes de carga em alguns níveis de concorrência para avaliar o comportamento do backpressure aplicado pelo Apache Kafka. Sendo possível avaliar as taxas de requisições com sucesso e com falha, além da saturação das aplicações no ambiente conteinerizado. Nos testes serão explorados os mecanismos que auxiliam no backpressure: buffer, modelo pub-sub, quotas e consumer groups.
 
   \begin{enumerate}
-    \item \textbf{Buffer e Pub-Sub}: Foi avaliado o consumo de CPU e Memória RAM no lado consumidor de duas aplicações, além do throughput e a latência do lado do produtor. A primeira aplicação faz a utilização do pelo Apache Kafka, no qual o produtor envia os eventos para o broker, e a aplicação consumidora faz o processamento. A segunda aplicação opera sem a utilização do Apache Kafka, com o produtor encaminhando as mensagens diretamente para o consumidor via HTTP/REST.
+    \item \textbf{Buffer e Pub-Sub}: Foi avaliado o consumo de CPU e Memória RAM no lado consumidor de duas aplicações, além do throughput e a latência do lado do produtor. A fim de entender o comportamento das aplicações em picos de cargas. A primeira aplicação faz a utilização do pelo Apache Kafka, no qual o produtor envia os eventos para o broker, e a aplicação consumidora faz o processamento. A segunda aplicação opera sem a utilização do Apache Kafka, com o produtor encaminhando as mensagens diretamente para o consumidor via HTTP/REST.
 
     Ambas as aplicações usam a ferramenta k6 para geração de requisições, possibilitando analisar como o buffer e o modelo pub-sub auxilia na implementação de backpressure (nativamente presentes no Apache Kafka). A ferramenta Apache Kafka foi configurada com 1 broker, fator de replicação 1, 3 partições por tópico, mantendo as demais configurações nos valores padrões definidos pela própria ferramenta. O produtor de evento seguiu as configurações padrões. No caso do consumidor, foi criado um consumer group com apenas uma instância da aplicação consumidora, parametrizado com um limite máximo de 100 eventos em cada poll, um intervalo de execução a cada 250 segundos, e as demais configurações mantendo os valores padrões definidos pela próprio Apache Kafka. Nos experimentos foram feitos testes exploratórios prévios, que identificou, que a aplicação sem a utilização do Apache Kafka se degrada a partir de 200 usuários simultâneos (Virtual Users - VUs). Assim, o planejamento do experimento definiu os seguintes parâmetros:
     \begin{itemize}
@@ -120,9 +120,7 @@
       \item \textbf{Intervalo}: Entre as requisições de cada usuário virtual foi adicionado uma pausa de 1 segundo, assim simulando o comportamento de uso mais realista.
     \end{itemize}
 
-    \item \textbf{Quotas}: Foi avaliado throughput e latência da aplicação produtora em dois cenários. O primeiro a aplicação produtora tem o limite padrão definido pelo Apache Kafka, e no segundo aplicação produtora tem limite de quotas por rede reduzido.
-
-    Em ambos os cenários foi utilizado a ferramenta k6 para geração de requisições. A ferramenta Apache Kafka foi configurada com 1 broker, fator de replicação 1, 3 partições por tópico, quotas de rede por produtor para 1024 bytes (apenas configurado para segundo cenário), mantendo as demais configurações nos valores padrões definidos pela própria ferramenta. Nos experimentos não foi utilizado consumidores.
+    \item \textbf{Quotas}: Foi avaliado throughput e latência da aplicação produtora em dois cenários. A fim de entender como a regulagem da vazão em picos de carga funciona via Apache Kafka. Os dois cenários contam com uma aplicação produtora, 1 broker com fator de replicação 1, 3 partições por tópico, quotas de rede por produtor para 1024 bytes (apenas configurado para segundo cenário), mantendo as demais configurações nos valores padrões definidos pela própria ferramenta. Nos experimentos não foram utilizados consumidores.
     O planejamento do experimento definiu os seguintes parâmetros:
     \begin{itemize}
       \item \textbf{Subida}: Um período inicial de 10 segundos para atingir a carga máxima de 200 VUs;
@@ -170,16 +168,18 @@
   \end{figure}
 
   \subsection{Quotas}
-  No gráfico da figura \ref{fig:quotasThroughputComparison}, observa-se o Throughput dos produtores em ambos os cenários com quotas reduzida para 1KB e com quotas padrão. Os experimentos contaram com um total de 35 segundos de execução dos testes de carga, além de alguns segundos iniciais e finais para estabilização das aplicações.
+  Nos gráficos das figuras \ref{fig:quotasThroughputComparison} e \ref{fig:quotasLatencyComparison}, observa-se o throughput e a latência dos produtores em ambos os cenários com quotas reduzidas para 1KB e com quotas padrão. Os experimentos contaram com um total de 35 segundos de execução dos testes de carga, além de alguns segundos iniciais e finais para estabilização das aplicações.
 
-  Analisando o gráfico dos experimentos, nota-se um throughput cerca de 4 vezes superior na aplicação com quota padrão do que a aplicação com a quota reduzida. A quota reduzido fez com que a aplicação gerasse 1056 eventos para o broker, enquanto a aplicação sem quotas gerou 4038. É redução é notada junto a uma latência superior na aplicação utilizando quotas. O Apache Kafka passa a atrasar a resposta ao produtor o que faz com que o mesmo passe a reduzir a quantidade de eventos até receber a confirmação dos enviado, assim, essa configuração faz com que o backpressure seja aplicado a nível geral de sistema/broker, controlando a utilização de recursos que podem afetar outros usuários do broker.
+  Analisando os gráficos dos experimentos, nota-se um throughput cerca de 4 vezes superior na aplicação com as configurações padrão para quotas do que a aplicação com a quota reduzida. A redução das quotas fez com que a aplicação gerasse 1056 eventos para o broker (cerca de 28 eventos por segundo), enquanto a aplicação sem quotas gerou 4038 (cerca de 113 eventos por segundo).
 
   \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.5\textwidth]{quotas-throughput-comparison.png}
-    \caption{Comparação entre Throughput entre cenários.}
+    \caption{Comparação entre throughput entre cenários.}
     \label{fig:quotasThroughputComparison}
   \end{figure}
+
+  É notado junto uma latência superior na aplicação utilizando quotas reduzidas com uma latência média de 4,43 segundos, contra 263 milissegundos da aplicação com Apache Kafka com a configuração de quotas padrão. Esse comportamento ocorre ao atingir o limite de 1 KB/s, o broker adiciona um tempo de atraso na resposta de confirmação de recebimento ao produtor. O atraso de confirmação bloqueia as threads da aplicação produtora e propaga o backpressure até os clientes geradores dos eventos, desacelerando a geração de novos eventos e evitando o acúmulo de requisições. A definição de quotas demonstra ser um mecanismo eficaz de backpressure a nível de broker, impedindo que um grupo de produtores sobrecarregue o sistema e comprometa o desempenho das aplicações consumidoras.
 
   \begin{figure}[htbp]
     \centering

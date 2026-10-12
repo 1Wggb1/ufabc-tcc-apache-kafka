@@ -120,13 +120,14 @@
       \item \textbf{Intervalo}: Entre as requisições de cada usuário virtual foi adicionado uma pausa de 1 segundo, assim simulando o comportamento de uso mais realista.
     \end{itemize}
 
-    \item \textbf{Quotas}: Foi avaliado throughput e latência da aplicação produtora em dois cenários. A fim de entender como a regulagem da vazão em picos de carga funciona via Apache Kafka. Os dois cenários contam com uma aplicação produtora, 1 broker com fator de replicação 1, 3 partições por tópico, quotas de rede por produtor para 1024 bytes (apenas configurado para segundo cenário), mantendo as demais configurações nos valores padrões definidos pela própria ferramenta. Nos experimentos não foram utilizados consumidores.
+    \item \textbf{Quotas}: Foi avaliado throughput e latência da aplicação produtora em alguns cenários. A fim de entender como a regulagem da vazão em picos de carga funciona via Apache Kafka. Os cenários contam com uma aplicação produtora, 1 broker com fator de replicação 1, 3 partições por tópico, quotas de rede por produtor variando de 1KB até 16KB, e comparante com a configuração de quotas de rede padrão. Mantendo as demais configurações nos valores padrões definidos pela própria ferramenta. Nos experimentos não foram utilizados consumidores.
     O planejamento do experimento definiu os seguintes parâmetros:
     \begin{itemize}
       \item \textbf{Subida}: Um período inicial de 10 segundos para atingir a carga máxima de 200 VUs;
       \item \textbf{Estabilidade}: Um período de 15 segundos em carga máxima;
       \item \textbf{Descida}: Um período de 10 segundos até chegar a 0 VUs;
-      \item \textbf{Intervalo}: Entre as requisições de cada usuário virtual foi adicionado uma pausa de 1 segundo, assim simulando o comportamento de uso mais realista.
+      \item \textbf{Intervalo}: Entre as requisições de cada usuário virtual foi adicionado uma pausa de 1 segundo, assim simulando o comportamento de uso mais realista;
+      \item \textbf{Quotas de redes}: Regulação das quotas de rede de 1KB/s até 16KB/s.
     \end{itemize}
 
 
@@ -135,8 +136,7 @@
   \end{enumerate}
 
   \section{Implementação das Aplicações}
-  Foram feitas duas implementações equivalentes: uma para produtor e outra consumidor. Para produtores foi criado um endpoint (HTTP - POST /produces) para recebimento de requisições para geração de eventos. Para consumidores foi colocado um timeout de 2 segundos simulando um processamento para cada evento/requisição. No cenário de uso do Apache Kafka os consumidores e produtores interagem diretamente com broker para envio e recebimento de eventos, neste cenário, não foi criado o endpoint na aplicação consumidora, pois a interação com broker é feita via polling após a inicialização da aplicação. Já no cenário sem o uso do Apache Kafka as aplicações interagem entre elas diretamente via HTTP utilizando REST, neste cenário, a aplicação consumidora expõe um endpoint (HTTP - POST /consumes) para recebimento de requisições do produtor.
-  Nas implementações a distinção existe no fato da interação com Apache Kafka para um dos cenários.
+  Foram feitas duas implementações equivalentes: uma para produtor e outra consumidor. Para produtores foi criado um endpoint (HTTP - POST /produces) para recebimento de requisições para geração de eventos. Para consumidores foi colocado um timeout de 2 segundos simulando um processamento para cada evento/requisição. No cenário de uso do Apache Kafka os consumidores e produtores interagem diretamente com broker para envio e recebimento de eventos, neste cenário, não foi criado o endpoint na aplicação consumidora, pois a interação com broker é feita via polling após a inicialização da aplicação. Já no cenário sem o uso do Apache Kafka as aplicações interagem entre elas diretamente via HTTP utilizando REST, neste cenário, a aplicação consumidora expõe um endpoint (HTTP - POST /consumes) para recebimento de requisições do produtor. Nas implementações a distinção existe no fato da interação com Apache Kafka para um dos cenários.
 
   \section{Resultado dos Experimentos}
 
@@ -168,25 +168,27 @@
   \end{figure}
 
   \subsection{Quotas}
-  Nos gráficos das figuras \ref{fig:quotasThroughputComparison} e \ref{fig:quotasLatencyComparison}, observa-se o throughput e a latência dos produtores em ambos os cenários com quotas reduzidas para 1KB e com quotas padrão. Os experimentos contaram com um total de 35 segundos de execução dos testes de carga, além de alguns segundos iniciais e finais para estabilização das aplicações.
+  Nas figuras \ref{fig:quotasThroughputComparison} e \ref{fig:quotasLatencyComparison}, observam-se o throughput e a latência dos produtores em cenários com restrições gradiaos de quotas de rede, variando de 1KB/s até 16KB/s, em comparação ao cenário com quotas de rede padrão. Os experimentos contaram com um total de 35 segundos de execução dos testes de carga, além de alguns segundos iniciais e finais para estabilização das aplicações.
 
-  Analisando os gráficos dos experimentos, nota-se um throughput cerca de 4 vezes superior na aplicação com as configurações padrão para quotas do que a aplicação com a quota reduzida. A redução das quotas fez com que a aplicação gerasse 1056 eventos para o broker (cerca de 28 eventos por segundo), enquanto a aplicação sem quotas gerou 4038 (cerca de 113 eventos por segundo).
+  Analisando a figura \ref{fig:quotasThroughputComparison}, nota-se um crescimento diretamente proprocional do throughput de acordo com as configurações de quotas de rede. Na restrição mais severa de 1KB/s a aplicação gerau 1056 eventos para o broker (cerca de 28 eventos por segundo). Essa taxa gradativamente foi aumentando até chegar próximo da configuração de padrão de quotas. Com quotas de rede configurada em 16KB/s foram gerados 3553 eventos (cerca de 99 eventos por segundo), contra 4038 (cerca de 113 eventos por segundo) com a configuração padrão. Em comparação entre o cenário com maior restrição 1KB/s para configutação padrão houve uma redução de cerca de 75,3\% do throughput.
 
   \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.5\textwidth]{quotas-throughput-comparison.png}
-    \caption{Comparação entre throughput entre cenários.}
+    \caption{Comparação entre throughput nos cenários.}
     \label{fig:quotasThroughputComparison}
   \end{figure}
 
-  É notado junto uma latência superior na aplicação utilizando quotas reduzidas com uma latência média de 4,43 segundos, contra 263 milissegundos da aplicação com Apache Kafka com a configuração de quotas padrão. Esse comportamento ocorre ao atingir o limite de 1 KB/s, o broker adiciona um tempo de atraso na resposta de confirmação de recebimento ao produtor. O atraso de confirmação bloqueia as threads da aplicação produtora e propaga o backpressure até os clientes geradores dos eventos, desacelerando a geração de novos eventos e evitando o acúmulo de requisições. A definição de quotas demonstra ser um mecanismo eficaz de backpressure a nível de broker, impedindo que um grupo de produtores sobrecarregue o sistema e comprometa o desempenho das aplicações consumidoras.
+  A latência figura \ref{fig:quotasLatencyComparison} apresentou um comportamento inversamente proporcional as quotas de rede. No cenário de 1KB/s a latência média das requisições foram de 4,43 segundos, reduzindo para 0,438 segundos com 16KB/s, contra 0,263 segundos no ambiente com configuração de quotas padrão. Desta forma, a aplicação com restrição para 1KB/s aumentou a latência cerca de 16,8 vezes. Esse aumento de latência nos cenários ocorre quando o limite em KB/s é atingido, assim o broker adiciona um tempo de atraso na resposta de confirmação de recebimento ao produtor (acknowledgment). O atraso de confirmação bloqueia as threads da aplicação produtora, a qaul passa a acumular os eventos em seu buffer interno, caso esse buffer exceda o limite configurado de memória e tempo a aplicação lança uma exceção e os eventos são perdidos (nos experimentos esse cenário não ocorreu).
 
   \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.5\textwidth]{quotas-latency-comparison.png}
-    \caption{Comparação entre latência entre cenários.}
+    \caption{Comparação entre latência nos cenários.}
     \label{fig:quotasLatencyComparison}
   \end{figure}
+
+  Os resultados dos experimentos de quotas de rede demonstram como a estratégia é eficaz para o backpressure a nível de broker. Essa abordagem impede que um grupo de produtores monopolize a utilização do broker, além de impedir o crescimento desordenado de eventos.
 
   \section{Conclusão}
 

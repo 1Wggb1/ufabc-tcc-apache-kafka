@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -45,7 +46,7 @@ class Main {
         @PostMapping
         public ResponseEntity<String> producesEvents(){
             int request = requestNumber.addAndGet(1);
-            IO.println("Starting event producer. Generating event %s".formatted(request));
+            IO.println("[%s] Starting event producer. Generating event %s".formatted(LocalDateTime.now(), request));
             String payload = """
                     {
                         "sku": "%s"
@@ -54,9 +55,9 @@ class Main {
             ProducerRecord<String, String> producerRecord = new ProducerRecord<>(topic, "" + request, payload);
             try {
                 doSend(producer, producerRecord);
-                IO.println("Event %s produced successfully".formatted(payload));
+                IO.println("[%s] Event %s produced successfully".formatted(LocalDateTime.now(), payload));
             } catch (Exception e){
-                IO.println("Exception %s in event %s".formatted(e.getMessage(), payload));
+                IO.println("[%s] Exception %s in event %s".formatted(LocalDateTime.now(), e.getMessage(), payload));
                 return ResponseEntity.status(HttpStatusCode.valueOf(504)).build();
             } finally {
                 producer.flush();

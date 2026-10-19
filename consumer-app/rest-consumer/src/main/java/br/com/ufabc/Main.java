@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+
 
 @SpringBootApplication
 class Main {
@@ -28,9 +30,9 @@ class Main {
     public static class ConsumerController {
         @PostMapping
         public ResponseEntity<EventResponse> consumerEvent(@RequestBody EventRequest event) throws InterruptedException {
-            IO.println("Starting event consume %s".formatted(event));
+            IO.println("[%s] Starting event %s consume".formatted(LocalDateTime.now(), event));
             Thread.sleep(2_000);
-            IO.println("Event processed %s".formatted(event));
+            IO.println("[%s] Event %s processed".formatted(LocalDateTime.now(), event));
             return ResponseEntity.ok(new EventResponse("Event Processed"));
         }
     }

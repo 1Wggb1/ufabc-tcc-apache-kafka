@@ -8,7 +8,9 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 class Main {
@@ -26,14 +28,16 @@ class Main {
         String topic = System.getenv("TOPIC_NAME");
         CONSUMER.subscribe(List.of(topic));
         int pollFrequencyMillis = Integer.parseInt(System.getenv("POLL_FREQUENCY_MILLIS"));
+        int fakeProcessingTimeMillisOrDefault2Seconds = Integer.parseInt(Optional.ofNullable(System.getenv("FAKE_PROCESSING_TIME_MILLIS"))
+                .orElse("2000"));
         while(true){
             ConsumerRecords<String, String> records = CONSUMER.poll(Duration.ofMillis(pollFrequencyMillis));
             for (ConsumerRecord<String, String> record : records){
                 IO.println("Key: " + record.key() + ", Partition: " + record.partition() + ", Offset:" + record.offset());
                 Event event = OBJECT_MAPPER.readValue(record.value(), Event.class);
-                IO.println("Starting event consume %s".formatted(event));
-                Thread.sleep(2_000);
-                IO.println("Event processed %s".formatted(event));
+                IO.println("[%s] Starting event %s consume".formatted(LocalDateTime.now(),event));
+                Thread.sleep(fakeProcessingTimeMillisOrDefault2Seconds);
+                IO.println("[%s] Event %s processed".formatted(LocalDateTime.now(), event));
             }
         }
     }

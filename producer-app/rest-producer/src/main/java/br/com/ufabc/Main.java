@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @SpringBootApplication
@@ -44,7 +45,7 @@ public class Main {
 
         @PostMapping
         public ResponseEntity<String> producesEvents() throws InterruptedException {
-            IO.println("Starting event producer. Generating event %s".formatted(requestNumber.addAndGet(1)));
+            IO.println("[%s] Starting event producer. Generating event %s".formatted(LocalDateTime.now(), requestNumber.addAndGet(1)));
             EventRequest eventRequest = new EventRequest("" + requestNumber.get());
             try {
                 ResponseEntity<Void> entity = restClient.post()
@@ -54,11 +55,11 @@ public class Main {
                         .toBodilessEntity();
                 HttpStatusCode statusCode = entity.getStatusCode();
                 if(statusCode.isError()){
-                    throw new RuntimeException("Error status code %s from event %s".formatted(statusCode, eventRequest));
+                    throw new RuntimeException("[%s] Error status code %s from event %s".formatted(LocalDateTime.now(), statusCode, eventRequest));
                 }
-                IO.println("Event %s produced successfully".formatted(eventRequest));
+                IO.println("[%s] Event %s produced successfully".formatted(LocalDateTime.now(), eventRequest));
             } catch (Exception e){
-                IO.println("Exception %s in event %s".formatted(e.getMessage(), eventRequest));
+                IO.println("[%s] Exception %s in event %s".formatted(LocalDateTime.now(), e.getMessage(), eventRequest));
                 return ResponseEntity.status(HttpStatusCode.valueOf(504)).build();
             }
             return ResponseEntity.ok("produced");

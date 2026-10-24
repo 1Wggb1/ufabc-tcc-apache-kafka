@@ -93,7 +93,7 @@
   Quotas no Apache Kafka tem o papel de rate limiting. Pelas quotas são possíveis especificar um limite máximo em Bytes ou consumo de CPU do servidor utilizado por produtores ou consumidores por segundos. As quotas se aplicam em todos os tópicos dos brokers. No caso dos produtores, o Apache Kafka não rejeita os eventos, mas passa a atrasar as respostas de confirmação, assim evitando o envio de novos eventos e o crescimento indeterminado do buffer. Quando o limite é atingido a aplicação (produtor ou consumidor) recebe uma resposta com o tempo até que o próximo evento possa ser enviado/recuperado, com esse valor a aplicação pode ajustar seus envios/recuperação \cite{conduktorQuotaDerosiaux2026}. As quotas podem ser configuradas por identificador do grupo, sendo consumidores ou produtores e/ou identificador da aplicação usuária.
 
   \subsubsection{Consumer groups}
-  Agrupamento de consumidores que viabiliza a escalabilidade horizontal ao permitir o processamento em paralelo de eventos de diferentes partições de um tópico. Neste modelo, cada membro de um grupo é atribuído a uma ou mais partições de forma exlusiva, garantindo a leitura de eventos entre os membros do mesmo grupo \cite{gorshkova2026kafka, conduktorConsumerGroupsDerosiaux2026}. Neste contexto, os consumer groups atuam como um mecanismo passivo de backpressure pela adição dinâmica de novos consumidores. Essa adição equilibra a capacidade de processamento com a taxa de produção.
+  Agrupamento de consumidores que viabiliza a escalabilidade horizontal ao permitir o processamento em paralelo de eventos de diferentes partições de um tópico, sem o risco de duplicação de processamento. Neste modelo, cada membro de um grupo é atribuído a uma ou mais partições de forma exlusiva, garantindo a leitura de eventos entre os membros do mesmo grupo \cite{gorshkova2026kafka, conduktorConsumerGroupsDerosiaux2026}. Neste contexto, os consumer groups atuam como um mecanismo passivo de backpressure pela adição dinâmica de novos consumidores. Essa adição equilibra a capacidade de processamento com a taxa de produção.
 
   \section{Metodologia}
 
@@ -129,11 +129,11 @@
       \item \textbf{Quotas de rede}: Regulação das quotas de rede de 1KB/s até 16KB/s (sendo multiplicado por 2 até chegar 16KB/s), e a quota padrão.
     \end{itemize}
 
-    \item \textbf{Consumer groups}: Foi avaliado o tempo de processamento da aplicação consumidora com base em sua escalabilidade. A fim de entender como a escalabilidade obtida por consumer groups auxiliam na compatibilização das taxas de produção e consumo de eventos. Os cenários contaram com uma aplicação produtora, 1 broker com fator de replicação 1, 3 partições por tópico. Para o consumidor, foi criado um consumer group e variando a quantidade de instância da aplicação consumidora de 1 até 3. Cada consumidor foi parametrizado com um limite máximo de 100 eventos em cada poll, um intervalo de execução a cada 30 segundos, um tempo de processamento de 250 ms para cada evento, e as demais configurações mantendo os valores padrões definidos pelo próprio Apache Kafka. Para fins de demonstração foram gerados um número fixo de requisições pela ferramenta k6.O planejamento do experimento definiu os seguintes parâmetros:
+    \item \textbf{Consumer groups}: Foi avaliado o tempo de processamento da aplicação consumidora com base em sua escalabilidade. A fim de entender como a escalabilidade obtida por consumer groups auxiliam na compatibilização das taxas de produção e consumo de eventos. Os cenários contaram com uma aplicação produtora, 1 broker com fator de replicação 1, 3 partições por tópico. Para o consumidor, foi criado um consumer group e variando a quantidade de instância da aplicação consumidora de 1 até 3. Cada consumidor foi parametrizado com um limite máximo de 100 eventos em cada poll, um intervalo de execução a cada 30 segundos, um tempo de processamento de 250 ms para cada evento, e as demais configurações mantendo os valores padrões definidos pelo próprio Apache Kafka. Para fins de demonstração foram gerados um número fixo de requisições pela ferramenta k6. O planejamento do experimento definiu os seguintes parâmetros:
     \begin{itemize}
       \item \textbf{Eventos}: Geração de um número fixo de eventos iniciando em 250 até 1000, aumentando em 250;
-      \item \textbf{Duração}: Um período de 30 segundos para gerar os eventos;
-      \item \textbf{Escalabilidadade dos consumidores por Consumer group}: Variação de 1 até 3 em cada cenário (foram utilizados no máximo 3 consumidores devido a mesma quantidade de partições. Um número maior de consumidores do que partições gera consumidores oscioso).
+      \item \textbf{Duração}: Um período de 30 segundos para geração dos eventos;
+      \item \textbf{Escalabilidadade dos consumidores por Consumer group}: Variação de 1 até 3 consumidores em cada cenário (foram utilizados no máximo 3 consumidores, mesma quantidade de partições. Um número maior de consumidores do que partições geraria consumidores oscioso).
     \end{itemize}
   \end{enumerate}
 
@@ -159,7 +159,7 @@
 
   Analisando o gráfico do experimento, nota-se que a aplicação consumidora mantém um consumo de memória e CPU quase constante durante tudo o experimento. Já aplicação produtora apresenta um pico de CPU de 108,52\% e de memória de 99,99\% aos 18 segundos do experimento. Ao contrário do cenário sem o Apache Kafka, no qual a aplicação consumidora precisaria estar disponível para processar e consumir as requisições na mesma taxa de produção, neste cenário as aplicações são desacopladas pelo modelo Pub-Sub baseado em pull e pelo buffer de persistência dos eventos no broker, garantindo a tolerância a falhas (evitando perdas de eventos).
 
-  Enquanto a alocação de 90 MB de memória na aplicação consumidora foi insuficiente para tratar as requisições no cenário sem o Apache Kafka, no cenário com a ferramenta essa mesma quantidade foi suficiente, sem qualquer saturação. Além disso, durante todo experimento, o broker absorveu a carga do produtor e do consumidor apresentando um consumo mínimo de CPU e memória. O backpressure obtido pelas utilização do Apache Kafka garante a independência entre a produção e consumo de eventos, permitindo que cada aplicação opere no seu próprio ritmo.
+  Enquanto a alocação de 90 MB de memória na aplicação consumidora foi insuficiente para tratar as requisições no cenário sem o Apache Kafka, no cenário com a ferramenta essa mesma quantidade foi suficiente, sem qualquer saturação. Além disso, durante todo experimento, o broker absorveu a carga do produtor e do consumidor apresentando um consumo mínimo de CPU e memória. O backpressure obtido pelas utilização do Apache Kafka garante a independência entre a produção e consumo de eventos, permitindo que cada aplicação operasse no seu próprio ritmo.
 
   Em métricas, a quantidade de eventos produzidos foi cerca de 6,8 vezes maior em comparação com a quantidade de requisições no cenário sem o broker, apresentando um throughput cerca de 7,3 vezes superior. Vale ressaltar que esses ganhos não decorrem exclusivamente do Apache Kafka como ferramenta, mas também da transição de uma arquitetura síncrona para uma arquitetura assíncrona orientada a eventos.
 
@@ -195,9 +195,9 @@
   No entanto, nota-se um ponto de atenção na aplicação produtora. A tolerância a falhas se degrada caso a aplicação não faça o tratamento adequado de exceções ao atingir os limites configurados na biblioteca cliente de integração com o Apache Kafka. Por se tratar de uma dependência do próprio produtor, alguns parâmetros como buffer e timeouts são de sua responsabilidade.
 
   \subsection{Consumer groups}
-  Na figura \ref{fig:eventProcessingTimeComparison}, oobserva-se o tempo total de processamento ao variar a quantidade de consumidores de 1 a 3 integrantes em um mesmo consumer group. Os experimentos contaram com um tempo máximo de 30 segundos para geração dos eventos.
+  Na figura \ref{fig:eventProcessingTimeComparison}, observa-se o tempo total de processamento ao variar a quantidade de consumidores de 1 a 3 integrantes em um mesmo consumer group (por sua escalabilidade). Os experimentos contaram com um tempo máximo de 30 segundos para geração dos eventos.
 
-  Analisando a figura \ref{fig:eventProcessingTimeComparison}, nota-se uma redução no tempo de processamento uma redução expressiva á medida que a escalabilidade dos consumidores aumentou. No cenário com volume de 250 eventos, um único consumidor (responsável pelo processamento dos eventos das 3 partições) consumiu o tempo de 64 segundos para processar todos eventos. Ao utilizar dois consumidores, o tempo foi reduzido à 44 segundos. Com três consumidores (alcançando o paralelismo de 1 consumidor por partição), o tempo foi reduzido para 26 segundos, o que representa um ganho de desempenho de aproximadamente 2,46 vezes em relação a 1 consumidor. No cenáro com carga de 1000 eventos a diferença do tempo de processamento de 1 para 3 consumidores foi de cerca de 2,8 vezes. No outros cenários a redução manteve um valor acima de 2 vezes.
+  Analisando a figura \ref{fig:eventProcessingTimeComparison}, nota-se uma redução no tempo de processamento de forma expressiva a medida que a escalabilidade dos consumidores aumenta. No cenário com volume de 250 eventos, um único consumidor (responsável pelo processamento dos eventos das 3 partições) consumiu o tempo de 64 segundos para processar todos eventos. Ao utilizar dois consumidores, o tempo foi reduzido à 44 segundos. Com três consumidores (alcançando o paralelismo de 1 consumidor por partição), o tempo foi reduzido para 26 segundos, o que representa um ganho de desempenho de aproximadamente 2,46 vezes em relação a 1 consumidor. No cenáro com carga de 1000 eventos a diferença do tempo de processamento de 1 para 3 consumidores foi de cerca de 2,8 vezes. No outros cenários a redução manteve um valor acima de 2 vezes.
 
   \begin{figure}[htbp]
     \centering
@@ -206,9 +206,7 @@
     \label{fig:eventProcessingTimeComparison}
   \end{figure}
 
-  Os resultados evidenciam que a escalabilidade horizontal via consumer groups atua como uma estratégia altamente eficaz de backpressure passivo ao equilibrar a taxa de consumo com a velocidade da produção. O paralelismo distribuído impediu o acúmulo ilimitado de requisições pendentes nas partições (consumer lag), permitindo que a infraestrutura absorvesse os picos de carga sem esgotamento de memória ou perda de previsibilidade.
-
-  Os resultados dos experimentos evidenciam que a escalabilidade horizontal via consumer groups atua de forma eficaz como backpressure passivo, ao nivelar a taxa de processamento com a velocidade de produção. O paralelismo impediu o acúmulo ilimitado de eventos nas partições e permitiu a redução do consumer lag.
+  Os resultados dos experimentos evidenciam que a escalabilidade horizontal via consumer groups atua de forma eficaz como backpressure passivo, ao nivelar a taxa de processamento com a velocidade de produção. O paralelismo impediu o acúmulo ilimitado de eventos nas partições e permitiu a redução do consumer lag (diferença entre o que é produzido e o que está sendo consumido). Contudo, a inclusão de um novo consumidor no grupo exige atenção em relação ao aumento temporário da latência provocado pelo rebalanceamento promovido pelo coordenador do grupo, momento no qual as partições são redistribuídas entre os membros do grupo.
 
   \subsection{Discussão e Lições Aprendidas}
   Os resultados dos experimentos evidenciam que a plataforma Apache Kafka, atuando como camada intermediária entre a produção e o consumo de eventos, atua de forma eficaz na mitigação da saturação e colapso das aplicações consumidoras em cenários de estresse.
@@ -216,9 +214,9 @@
   \textbf{Em suma, o experimento confirma que:}
 
   \begin{enumerate}
-    \item A combinação do modelo Pub-Sub baseado em pull com Buffer viabilizou a implementação backpressure. Enquanto o Buffer assegurou a retenção de eventos sem perda de dados em picos de carga, o modelo Pub-Sub viabilizou a independência temporal entre produtores e consumidores de dados, previnindo a saturação e colopso dos consumidores;
-    \item A aplicação de quotas de rede viabilizou o controle do produtor de eventos, evitando a saturação da capacidade do Buffer (tópicos) e nívelando as taxas de produção e consumo de eventos.
-    \item A escalabilidadde do consumidores por meio dos consumer groups  e partições possibilitou taxas de produção e processamento mais compatíveis.
+    \item A combinação do modelo Pub-Sub baseado em pull com buffer viabilizou a implementação backpressure. Enquanto o buffer assegurou a retenção de eventos sem perda de dados em picos de carga, o modelo Pub-Sub viabilizou a independência temporal entre produtores e consumidores de dados, previnindo a saturação e colapso dos consumidores;
+    \item A aplicação de quotas de rede viabilizou o controle do produtor de eventos (upstream), evitando a saturação da capacidade do buffer (tópicos), nívelando as taxas de produção e consumo de eventos, e contendo o número de requisições descontroladas a ferramenta.
+    \item A escalabilidadde de instâncias das aplicações consumidoras por meio de consumer groups viabilizou adequar as taxas de eventos gerados à capacidade de processamento. A redistribuição das partições evitou o crescimento indeterminado do tempo de retenção nas partições (consumer lag), aproximando a taxa de processamento da taxa de produção sem comprometer a estabilidade das aplicações.
   \end{enumerate}
 
   \section{Conclusão}

@@ -66,7 +66,7 @@ services:
       GROUP_ID: ufabc.consumer
       OFFSET_RESET_CONFIG: latest
       MAX_POLL_RECORDS: 100
-      POLL_FREQUENCY_MILLIS: 30000
+      POLL_FREQUENCY_MILLIS: 250
       FAKE_PROCESSING_TIME_MILLIS: 250
     deploy:
       resources:

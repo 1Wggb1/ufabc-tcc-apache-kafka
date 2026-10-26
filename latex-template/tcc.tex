@@ -5,6 +5,10 @@
 \usepackage[utf8]{inputenc}
 \usepackage[brazil]{babel}
 \usepackage[latin1]{inputenc}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{indentfirst}
 
 
 \sloppy
@@ -25,11 +29,11 @@
   \maketitle
 
   \begin{abstract}
-    This article analyzes the theoretical foundations and the importance of backpressure strategies using Apache Kafka in distributed systems. The primary focus of this study is an experimental evaluation of the platform, exploring its native overload control mechanisms—specifically throughput regulation via quotas and consumer groups, as well as peak load absorption through buffers and the pub-sub model.
+    This article analyzes the theoretical foundations and the importance of backpressure strategies using Apache Kafka in distributed systems. The primary focus of this study is an experimental evaluation of the platform, exploring its native overload control mechanisms—specifically ((backpressure) throughput regulation via quotas and consumer groups, as well as peak load absorption through buffers and the pub-sub model.
   \end{abstract}
 
   \begin{resumo}
-    Este artigo analisa os fundamentos teóricos e a importância de estratégias de backpressure com o Apache Kafka em sistemas distribuídos. O estudo tem como foco central a avaliação experimental da plataforma, explorando seus mecanismos nativos de controle de sobrecarga, pela regulação de vazão mediante quotas e consumer groups, e a absorção de picos de carga por meio de buffers e do modelo pub-sub.
+    Este artigo analisa os fundamentos teóricos e a importância de estratégias de backpressure com o Apache Kafka em sistemas distribuídos. O estudo tem como foco central a avaliação experimental da plataforma, explorando seus mecanismos nativos de controle de sobrecarga (backpressure), pela regulação de vazão mediante quotas e consumer groups, e a absorção de picos de carga por meio de buffers e do modelo pub-sub.
   \end{resumo}
 
 
@@ -76,9 +80,12 @@
 
   \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.5\textwidth]{kafka-architecture.jpg}
     \caption{Arquitetura do Apache Kafka destacando o fluxo dos eventos dos produtores para brokers, tópicos, partições e consumidores.}
     \label{fig:kafkaarchitecture}
+    \vspace{4pt}
+    \includegraphics[width=0.5\textwidth]{kafka-architecture.jpg}
+    \vspace{4pt}
+
     {\footnotesize Fonte: Ksolves (2024).}
   \end{figure}
 
@@ -142,9 +149,9 @@
   \section{Implementação das Aplicações}
   Foram feitas duas implementações equivalentes: uma para o produtor e outra para o consumidor. Na aplicação produtora foi criado um \textit{endpoint} (HTTP - POST /produces), responsável pelo recebimento de requisições HTTP para geração de eventos. Na aplicação consumidora foi configurado um tempo de processamento de 2 segundos evento/requisição.
 
-  No cenário de uso do Apache Kafka, produtores e consumidores interagem diretamente com o \textit{broker} para envio e recebimento de eventos. Neste cenário, a aplicação consumidora não contou com exposição de \textit{endpoints} HTTP, uma vez que a interação com broker é feita via consultas assíncronas períodicas (\textit{polling}), após a inicialização da aplicação. Por outro lado, no cenário sem o uso do Apache Kafka, as aplicações interagem entre elas diretamente via HTTP utilizando REST de forma síncrona, no qual, a aplicação consumidora expõe um \textit{endpoint} (HTTP - POST /consumes) para recebimento de requisições do produtor.
+  No cenário de uso do Apache Kafka, produtores e consumidores interagem diretamente com o \textit{broker} para envio e recebimento de eventos. Neste cenário, a aplicação consumidora não contou com exposição de \textit{endpoints} HTTP, uma vez que a interação com \textit{broker} é feita via consultas assíncronas períodicas (\textit{polling}), após a inicialização da aplicação. Por outro lado, no cenário sem o uso do Apache Kafka, as aplicações interagem entre elas diretamente via HTTP utilizando REST de forma síncrona, no qual, a aplicação consumidora expõe um \textit{endpoint} (HTTP - POST /consumes) para recebimento de requisições do produtor.
 
-  As aplicações foram implementadas utilizando a linguagem de programação Java na versão 26, o framework Spring Boot na versão 4.1 (restrito às aplicações produtoras e à aplicação consumidora do cenário sem Kafka) e a biblioteca kafka-clients na versão 4.3.1 para produção e consumo de eventos.
+  As aplicações foram implementadas utilizando a linguagem de programação Java na versão 26, o \textit{framework} Spring Boot na versão 4.1 (restrito às aplicações produtoras e à aplicação consumidora do cenário sem Kafka) e a biblioteca kafka-clients na versão 4.3.1 para produção e consumo de eventos.
 
   \section{Resultado dos Experimentos}
 
@@ -155,9 +162,12 @@
 
   \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.5\textwidth]{graph-ram-cpu-consumption-by-seconds-load-test.png}
-    \caption{Consumo de CPU e Memória RAM no experimento sem o uso do Apache Kafka.}
+    \caption{Consumo de CPU/RAM no experimento sem o uso do Apache Kafka.}
     \label{fig:consumeWithoutKafka}
+    \vspace{4pt}
+    \includegraphics[width=0.5\textwidth]{graph-ram-cpu-consumption-by-seconds-load-test.png}
+
+    \vspace{4pt}
     {\footnotesize Fonte: Elaborada pelo autor (2026).}
   \end{figure}
 
@@ -171,9 +181,12 @@
 
   \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.5\textwidth]{graph-ram-cpu-consumption-by-seconds-load-test-kafka.png}
     \caption{Consumo de CPU e Memória RAM no experimento com Apache Kafka.}
     \label{fig:consumeWithKafka}
+    \vspace{4pt}
+    \includegraphics[width=0.5\textwidth]{graph-ram-cpu-consumption-by-seconds-load-test-kafka.png}
+
+    \vspace{4pt}
     {\footnotesize Fonte: Elaborada pelo autor (2026).}
   \end{figure}
 
@@ -184,9 +197,12 @@
 
   \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.5\textwidth]{quotas-throughput-comparison.png}
     \caption{Comparação entre throughput nos cenários.}
     \label{fig:quotasThroughputComparison}
+    \vspace{4pt}
+    \includegraphics[width=0.5\textwidth]{quotas-throughput-comparison.png}
+
+    \vspace{4pt}
     {\footnotesize Fonte: Elaborada pelo autor (2026).}
   \end{figure}
 
@@ -194,9 +210,12 @@
 
   \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.5\textwidth]{quotas-latency-comparison.png}
     \caption{Comparação entre latência nos cenários.}
     \label{fig:quotasLatencyComparison}
+    \vspace{4pt}
+    \includegraphics[width=0.5\textwidth]{quotas-latency-comparison.png}
+
+    \vspace{4pt}
     {\footnotesize Fonte: Elaborada pelo autor (2026).}
   \end{figure}
 
@@ -210,9 +229,12 @@
 
   \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.5\textwidth]{event-processing-time-comparison.png}
     \caption{Comparação entre tempos de processamento.}
     \label{fig:eventProcessingTimeComparison}
+    \vspace{4pt}
+    \includegraphics[width=0.5\textwidth]{event-processing-time-comparison.png}
+
+    \vspace{4pt}
     {\footnotesize Fonte: Elaborada pelo autor (2026).}
   \end{figure}
 
@@ -224,7 +246,7 @@
   \textbf{Em suma, o experimento confirma que:}
 
   \begin{enumerate}
-    \item A combinação do modelo Pub-Sub baseado em \textit{pull} com \textit{buffer} viabilizou a implementação \textit{backpressure}. Enquanto o \textit{buffer} assegurou a retenção de eventos sem perda de dados em picos de carga, o modelo Pub-Sub viabilizou a independência temporal entre produtores e consumidores de dados, previnindo a saturação e colapso dos consumidores;
+    \item A combinação do modelo Pub-Sub baseado em \textit{pull} com \textit{buffer} viabilizou a implementação \textit{backpressure}. Enquanto o \textit{buffer} assegurou a retenção de eventos sem perda de dados em picos de carga, o modelo Pub-Sub viabilizou a independência temporal entre produtores e consumidores de dados, previnindo a saturação e colapso dos consumidores.
 
     \item A aplicação de quotas de rede viabilizou o controle do produtor de eventos (\textit{upstream}), evitando a saturação da capacidade do \textit{buffer} (tópicos), nívelando as taxas de produção e consumo de eventos, e contendo o número de requisições descontroladas a ferramenta.
 
@@ -235,8 +257,33 @@
   Para a replicação dos experimentos, o código-fonte, os scripts de teste (k6) e bash, e as configurações do ambiente (Docker Compose) estão disponíveis publicamente no repositório mantido por \cite{garbo2026kafka}.
 
   \section{Conclusão}
+  Este trabalho apresentou a avaliação de mecanismos de \textit{backpressure} via Apache Kafka. Por meio de testes de carga, observou-se que a utilização da ferramenta impacta a resiliência de aplicações, principalmente em momentos de alta demanda.
 
+  Os resultados experimentais indicam que os mecanismos de \textit{backpressure} presentes no Apache Kafka permitiram que as aplicações consumidoras não colapsassem (como aconteceu no cenário sem o uso da plataforma) e continuassem a processar os eventos independente da taxa de produção em períodos de picos de carga. Constatou-se também que o incremento dinâmico de novas aplicações consumidoras via \textit{consumer groups} aumenta proprocionalmente a vazão de processamento, permitindo o nivelamento entre a taxa de produção e consumo, promovendo uma diminuição superior a 2 vezes no tempo de processamento de eventos quando igualado o número de consumidores ao de partições nos tópicos. Por fim, verificou-se que o controle de fluxo baseado no limite de bytes por segundos das aplicações produtoras, conteve o crescimento exponencial do volume de eventos e permitiu o restabelecimento de uma taxa de geração de eventos compatível com a capacidade de processamento dos consumidores, conforme demonstrado pela diminuição dos eventos produzidos ao ajustar as configurações de quotas. A tabela \ref{tab:comparativo-mecanismos} faz o resumo dos 3 experimentos.
 
+  \begin{table}[htbp]
+    \centering
+    \caption{Resumo das estratégias de \textit{backpressure} avaliadas.}
+    \label{tab:comparativo-mecanismos}
+    \vspace{4pt}
+    \begin{tabularx}{\textwidth}{@{} >{\raggedright\arraybackslash}p{2.8cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X @{}}
+    \toprule
+    \textbf{Mecanismo do Apache Kafka} & \textbf{Estratégia de Controle} & \textbf{Impacto} & \textbf{Benefício} \\ \midrule
+    Buffer \& Pub-Sub & Desacoplamento e Pull & Throughput (até 6,8 vezes maior - comparação com arquitetura síncrona) & Proteção contra falta de memória, sobrecarga de processamento e perda de dados \\ \addlinespace
+    Quotas de Rede & Rate Limiting na produção de eventos & Latência (até 16,8 vezes maior - ao comparar com cenário com configuração padrão contra cenário de 1KB/s) & Prevenção da saturação do broker e controle do crescimento do tópico \\ \addlinespace
+    Consumer Groups & Escalabilidade Horizontal dos consumidores & Tempo de execução (até 2,8 vezes maior - ao utilizar mesmo número de consumidores que partições) & Mitigação do consumer lag e aproximar os ritmos entre as taxas de produção e consumo\\ \bottomrule
+    \end{tabularx}
+    \vspace{4pt}
+
+    \begin{minipage}{\textwidth}
+      \footnotesize Fonte: Elaborada pelo autor (2026).
+    \end{minipage}
+  \end{table}
+
+  Como contribuição, este trabalho oferece um ambiente experimental controlado e reprodutível à comunidade acadêmica. Para trabalhos futuros, recomenda-se a avaliação de cenários com maior escala de volumetria, além da análise de outros parâmetros configuráveis do Apache Kafka que auxiliam no \textit{backpressure}.
+
+  \section{Uso de Inteligência Artificial}
+  Neste trabalho, utilizou-se a inteligência artificial Gemini (modelo Gemini 3.6 Flash) para a revisão gramatical, ajuste de pontuação e  fluidez do texto. Além disso, a inteligência artificial também foi utilizada no suporte à geração dos gráficos de resultados e na documentação do repositório de experimentos no GitHub.
 
   \bibliographystyle{sbc}
   \bibliography{sbc-template}

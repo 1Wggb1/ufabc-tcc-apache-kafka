@@ -1,4 +1,4 @@
-# Experimentos de Avaliação de Backpressure
+# Experimentos de Avaliação de Backpressure com Apache Kafka
 
 Este repositório possibilita a reprodutibilidade dos experimentos do artigo científico `Mecanismos de Backpressure com Apache Kakfa`.
 Os experimentos buscam analisar os mecanismos de Backpressure de desacoplamento, controle de vazão e escalabilidade em arquiteturas orientadas a eventos utilizando o **Apache Kafka**.
